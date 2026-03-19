@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import tech.nomad4.backupmanager.isolate.socket.model.SocketType;
+import tech.nomad4.dockersocketmanager.model.SocketType;
 
 import java.time.LocalDateTime;
 

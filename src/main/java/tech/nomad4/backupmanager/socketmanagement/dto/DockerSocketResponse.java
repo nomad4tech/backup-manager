@@ -2,7 +2,7 @@ package tech.nomad4.backupmanager.socketmanagement.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import tech.nomad4.backupmanager.isolate.socket.model.SocketType;
+import tech.nomad4.dockersocketmanager.model.SocketType;
 import tech.nomad4.backupmanager.socketmanagement.entity.ConnectionStatus;
 import tech.nomad4.backupmanager.socketmanagement.entity.DockerSocket;
 import tech.nomad4.backupmanager.socketmanagement.entity.SocatStatus;

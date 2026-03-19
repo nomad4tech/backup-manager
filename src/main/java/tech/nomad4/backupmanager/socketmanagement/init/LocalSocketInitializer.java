@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-import tech.nomad4.backupmanager.isolate.socket.model.SocketType;
-import tech.nomad4.backupmanager.isolate.socket.util.DockerEnvironmentDetector;
+import tech.nomad4.dockersocketmanager.model.SocketType;
+import tech.nomad4.dockersocketmanager.util.DockerEnvironmentDetector;
 import tech.nomad4.backupmanager.socketmanagement.entity.DockerSocket;
 import tech.nomad4.backupmanager.socketmanagement.repository.DockerSocketRepository;
 

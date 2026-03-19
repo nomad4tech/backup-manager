@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import tech.nomad4.backupmanager.isolate.socket.exception.DockerConnectionException;
+import tech.nomad4.dockersocketmanager.exception.DockerConnectionException;
 import tech.nomad4.backupmanager.socketmanagement.dto.ConnectionTestResponse;
 import tech.nomad4.backupmanager.socketmanagement.dto.DockerSocketCreateRequest;
 import tech.nomad4.backupmanager.socketmanagement.dto.DockerSocketResponse;

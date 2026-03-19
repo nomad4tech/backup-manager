@@ -22,7 +22,7 @@ import tech.nomad4.backupmanager.isolate.discoveryapi.dto.ContainerDetailRespons
 import tech.nomad4.backupmanager.isolate.discoveryapi.dto.ContainerSummaryResponse;
 import tech.nomad4.backupmanager.isolate.discoveryapi.dto.SupportedTypeResponse;
 import tech.nomad4.backupmanager.isolate.discoveryapi.service.DatabaseListService;
-import tech.nomad4.backupmanager.isolate.socket.exception.DockerConnectionException;
+import tech.nomad4.dockersocketmanager.exception.DockerConnectionException;
 import tech.nomad4.backupmanager.socketmanagement.exception.SocketNotFoundException;
 import tech.nomad4.backupmanager.socketmanagement.service.DockerSocketFacadeService;
 

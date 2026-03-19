@@ -35,7 +35,20 @@
         <awssdk.version>2.26.31</awssdk.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/nomad4tech/docker-socket-manager</url>
+        </repository>
+    </repositories>
+
     <dependencies>
+        <dependency>
+            <groupId>tech.nomad4</groupId>
+            <artifactId>docker-socket-manager</artifactId>
+            <version>0.1.0</version>
+        </dependency>
+
         <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

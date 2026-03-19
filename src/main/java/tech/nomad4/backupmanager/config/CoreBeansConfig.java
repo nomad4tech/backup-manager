@@ -16,7 +16,7 @@ import tech.nomad4.backupmanager.isolate.command.service.PostgresCommandService;
 import tech.nomad4.backupmanager.discovery.filter.ContainerFilter;
 import tech.nomad4.backupmanager.discovery.filter.PostgresContainerFilter;
 import tech.nomad4.backupmanager.discovery.service.ContainerDiscoveryService;
-import tech.nomad4.backupmanager.isolate.socket.service.DockerSocketService;
+import tech.nomad4.dockersocketmanager.service.DockerSocketService;
 import tech.nomad4.backupmanager.isolate.storage.service.StorageService;
 
 import java.util.List;

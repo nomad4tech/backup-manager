@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tech.nomad4.backupmanager.isolate.socket.service.DockerSocketService;
+import tech.nomad4.dockersocketmanager.service.DockerSocketService;
 import tech.nomad4.backupmanager.socketmanagement.entity.ConnectionStatus;
 import tech.nomad4.backupmanager.socketmanagement.entity.DockerSocket;
 import tech.nomad4.backupmanager.socketmanagement.repository.DockerSocketRepository;
