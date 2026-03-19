@@ -1,11 +1,11 @@
-package tech.nomad4.backupmanager.isolate.discoveryapi.dto;
+package tech.nomad4.backupmanager.discoveryapi.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-import tech.nomad4.backupmanager.discovery.entity.ContainerInfo;
-import tech.nomad4.backupmanager.discovery.entity.ContainerState;
-import tech.nomad4.backupmanager.discovery.entity.DatabaseType;
+import tech.nomad4.backupmanager.isolate.discovery.entity.ContainerInfo;
+import tech.nomad4.backupmanager.isolate.discovery.entity.ContainerState;
+import tech.nomad4.backupmanager.isolate.discovery.entity.DatabaseType;
 
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package tech.nomad4.backupmanager.discovery.entity;
+package tech.nomad4.backupmanager.isolate.discovery.entity;
 
 /**
  * Represents the runtime state of a Docker container.

@@ -1,4 +1,4 @@
-package tech.nomad4.backupmanager.isolate.discoveryapi.controller;
+package tech.nomad4.backupmanager.discoveryapi.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,14 +14,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.nomad4.backupmanager.isolate.command.exception.CommandExecutionException;
-import tech.nomad4.backupmanager.discovery.entity.ContainerInfo;
-import tech.nomad4.backupmanager.discovery.entity.DatabaseType;
-import tech.nomad4.backupmanager.discovery.exception.ContainerDiscoveryException;
-import tech.nomad4.backupmanager.discovery.service.ContainerDiscoveryService;
-import tech.nomad4.backupmanager.isolate.discoveryapi.dto.ContainerDetailResponse;
-import tech.nomad4.backupmanager.isolate.discoveryapi.dto.ContainerSummaryResponse;
-import tech.nomad4.backupmanager.isolate.discoveryapi.dto.SupportedTypeResponse;
-import tech.nomad4.backupmanager.isolate.discoveryapi.service.DatabaseListService;
+import tech.nomad4.backupmanager.isolate.discovery.entity.ContainerInfo;
+import tech.nomad4.backupmanager.isolate.discovery.entity.DatabaseType;
+import tech.nomad4.backupmanager.isolate.discovery.exception.ContainerDiscoveryException;
+import tech.nomad4.backupmanager.isolate.discovery.service.ContainerDiscoveryService;
+import tech.nomad4.backupmanager.discoveryapi.dto.ContainerDetailResponse;
+import tech.nomad4.backupmanager.discoveryapi.dto.ContainerSummaryResponse;
+import tech.nomad4.backupmanager.discoveryapi.dto.SupportedTypeResponse;
+import tech.nomad4.backupmanager.discoveryapi.service.DatabaseListService;
 import tech.nomad4.dockersocketmanager.exception.DockerConnectionException;
 import tech.nomad4.backupmanager.socketmanagement.exception.SocketNotFoundException;
 import tech.nomad4.backupmanager.socketmanagement.service.DockerSocketFacadeService;

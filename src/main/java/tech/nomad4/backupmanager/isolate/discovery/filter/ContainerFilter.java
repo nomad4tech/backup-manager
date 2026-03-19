@@ -1,14 +1,15 @@
-package tech.nomad4.backupmanager.discovery.filter;
+package tech.nomad4.backupmanager.isolate.discovery.filter;
 
 import com.github.dockerjava.api.model.Container;
-import tech.nomad4.backupmanager.discovery.entity.DatabaseType;
+import tech.nomad4.backupmanager.isolate.discovery.entity.DatabaseType;
+import tech.nomad4.backupmanager.isolate.discovery.service.ContainerDiscoveryService;
 
 /**
  * Filter for identifying database containers by their Docker image.
  * <p>
  * Implementations define matching logic for a specific database type.
  * All registered filters are automatically injected into the
- * {@link tech.nomad4.backupmanager.discovery.service.ContainerDiscoveryService}
+ * {@link ContainerDiscoveryService}
  * for container classification.
  * </p>
  */

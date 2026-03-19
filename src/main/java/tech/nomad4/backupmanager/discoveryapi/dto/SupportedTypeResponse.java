@@ -1,9 +1,9 @@
-package tech.nomad4.backupmanager.isolate.discoveryapi.dto;
+package tech.nomad4.backupmanager.discoveryapi.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import tech.nomad4.backupmanager.discovery.entity.DatabaseType;
+import tech.nomad4.backupmanager.isolate.discovery.entity.DatabaseType;
 
 /**
  * Represents a database type supported by the discovery service.

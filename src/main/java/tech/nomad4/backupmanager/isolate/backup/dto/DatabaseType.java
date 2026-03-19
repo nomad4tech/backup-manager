@@ -10,7 +10,7 @@ import tech.nomad4.backupmanager.isolate.backup.strategy.BackupStrategy;
  * Database types recognised by the backup module.
  * <p>
  * This enum is intentionally independent of
- * {@link tech.nomad4.backupmanager.discovery.entity.DatabaseType}. The two enums
+ * {@link tech.nomad4.backupmanager.isolate.discovery.entity.DatabaseType}. The two enums
  * serve different bounded contexts:
  * <ul>
  *   <li><b>discovery</b> – detects <em>any</em> database container from a Docker image name.</li>

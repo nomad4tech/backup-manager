@@ -1,4 +1,4 @@
-package tech.nomad4.backupmanager.isolate.discoveryapi.service;
+package tech.nomad4.backupmanager.discoveryapi.service;
 
 import com.github.dockerjava.api.DockerClient;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import tech.nomad4.backupmanager.isolate.command.dto.DatabaseCommand;
 import tech.nomad4.backupmanager.isolate.command.exception.CommandExecutionException;
 import tech.nomad4.backupmanager.isolate.command.service.MysqlCommandService;
 import tech.nomad4.backupmanager.isolate.command.service.PostgresCommandService;
-import tech.nomad4.backupmanager.discovery.entity.DatabaseType;
+import tech.nomad4.backupmanager.isolate.discovery.entity.DatabaseType;
 
 import java.util.Arrays;
 import java.util.List;

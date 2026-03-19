@@ -1,15 +1,15 @@
-package tech.nomad4.backupmanager.discovery.service;
+package tech.nomad4.backupmanager.isolate.discovery.service;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.ContainerPort;
 import lombok.extern.slf4j.Slf4j;
-import tech.nomad4.backupmanager.discovery.entity.ContainerInfo;
-import tech.nomad4.backupmanager.discovery.entity.ContainerState;
-import tech.nomad4.backupmanager.discovery.entity.DatabaseType;
-import tech.nomad4.backupmanager.discovery.exception.ContainerDiscoveryException;
-import tech.nomad4.backupmanager.discovery.filter.ContainerFilter;
+import tech.nomad4.backupmanager.isolate.discovery.entity.ContainerInfo;
+import tech.nomad4.backupmanager.isolate.discovery.entity.ContainerState;
+import tech.nomad4.backupmanager.isolate.discovery.entity.DatabaseType;
+import tech.nomad4.backupmanager.isolate.discovery.exception.ContainerDiscoveryException;
+import tech.nomad4.backupmanager.isolate.discovery.filter.ContainerFilter;
 
 import java.util.*;
 import java.util.stream.Collectors;

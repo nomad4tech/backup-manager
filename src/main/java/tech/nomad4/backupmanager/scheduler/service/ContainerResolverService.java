@@ -4,8 +4,8 @@ import com.github.dockerjava.api.DockerClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import tech.nomad4.backupmanager.discovery.entity.ContainerInfo;
-import tech.nomad4.backupmanager.discovery.service.ContainerDiscoveryService;
+import tech.nomad4.backupmanager.isolate.discovery.entity.ContainerInfo;
+import tech.nomad4.backupmanager.isolate.discovery.service.ContainerDiscoveryService;
 
 /**
  * Resolves a container ID before each backup run, handling the case where

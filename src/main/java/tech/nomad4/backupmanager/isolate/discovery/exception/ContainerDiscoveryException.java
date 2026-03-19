@@ -1,4 +1,4 @@
-package tech.nomad4.backupmanager.discovery.exception;
+package tech.nomad4.backupmanager.isolate.discovery.exception;
 
 /**
  * Thrown when container discovery or inspection fails.

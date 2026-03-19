@@ -1,4 +1,4 @@
-package tech.nomad4.backupmanager.discovery.entity;
+package tech.nomad4.backupmanager.isolate.discovery.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

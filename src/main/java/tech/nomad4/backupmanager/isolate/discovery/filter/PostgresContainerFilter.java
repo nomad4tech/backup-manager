@@ -1,7 +1,7 @@
-package tech.nomad4.backupmanager.discovery.filter;
+package tech.nomad4.backupmanager.isolate.discovery.filter;
 
 import com.github.dockerjava.api.model.Container;
-import tech.nomad4.backupmanager.discovery.entity.DatabaseType;
+import tech.nomad4.backupmanager.isolate.discovery.entity.DatabaseType;
 
 /**
  * Filter that identifies PostgreSQL database containers.
