@@ -1,0 +1,75 @@
+spring:
+  application:
+    name: backup-manager
+
+  datasource:
+    url: ${DATASOURCE_URL:jdbc:h2:file:./data/backup-manager;AUTO_SERVER=TRUE}
+    username: sa
+    password: sa
+    driver-class-name: org.h2.Driver
+
+  h2:
+    console:
+      enabled: false
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+  task:
+    scheduling:
+      enabled: true
+
+server:
+  port: 8080
+
+backup-manager:
+  cors:
+    allowed-origins: "*"   # Override via env: BACKUP_MANAGER_CORS_ALLOWED_ORIGINS=https://myhost.com,https://other.com
+
+  backup:
+    base-directory: ${BACKUP_MANAGER_BACKUP_BASE_DIRECTORY:./backups}
+    default-timeout: 3600        # Max seconds to wait for a dump command (1 hour)
+
+  command:
+    default-timeout: 3600        # Default command timeout in seconds (1 hour)
+    default-ttl: 3600            # How long to keep completed results in seconds (1 hour)
+    max-concurrent: 10           # Max concurrent async operations
+    cleanup-interval: 300000     # Cleanup interval in milliseconds (5 minutes)
+
+logging:
+  level:
+    tech.nomad4: INFO
+    tech.nomad4.socket.init: INFO
+    org.hibernate.SQL: WARN
+
+---
+# Development profile (local run)
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    tech.nomad4: DEBUG
+    org.hibernate.SQL: DEBUG
+
+---
+# Docker profile (running in container)
+spring:
+  config:
+    activate:
+      on-profile: docker
+
+logging:
+  level:
+    tech.nomad4: INFO
