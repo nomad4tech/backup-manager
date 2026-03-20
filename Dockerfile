@@ -12,7 +12,15 @@ RUN npm run build
 # ─── Stage 2: Build backend ────────────────────────────────────────────────
 FROM maven:3.9-eclipse-temurin-17-alpine AS backend-builder
 
+ARG GITHUB_ACTOR
+ARG GITHUB_TOKEN
+
 WORKDIR /app
+
+# Configure Maven to use GitHub Packages if GITHUB_TOKEN is provided
+RUN if [ -n "${GITHUB_TOKEN}" ]; then \
+      mkdir -p /root/.m2 && printf '<settings>\n  <servers>\n    <server>\n      <id>github</id>\n      <username>%s</username>\n      <password>%s</password>\n    </server>\n  </servers>\n</settings>\n' "${GITHUB_ACTOR}" "${GITHUB_TOKEN}" > /root/.m2/settings.xml; \
+    fi
 
 COPY pom.xml ./
 RUN mvn dependency:go-offline -q
