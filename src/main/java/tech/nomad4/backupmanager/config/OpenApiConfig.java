@@ -1,5 +1,6 @@
 package tech.nomad4.backupmanager.config;
 
+import io.swagger.v3.oas.models.ExternalDocumentation;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
@@ -36,6 +37,9 @@ public class OpenApiConfig {
                                 .email("alex.sav4387@gmail.com"))
                         .license(new License()
                                 .name("MIT License")
-                                .url("https://opensource.org/licenses/MIT")));
+                                .url("https://opensource.org/licenses/MIT")))
+                .externalDocs(new ExternalDocumentation()
+                        .description("GitHub Repository")
+                        .url("https://github.com/nomad4tech/backup-manager"));
     }
 }

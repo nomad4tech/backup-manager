@@ -74,6 +74,9 @@ public class SecurityConfig {
                                 "/index.html",
                                 "/favicon.ico",
                                 "/favicon.svg").permitAll()
+                        .requestMatchers("/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
