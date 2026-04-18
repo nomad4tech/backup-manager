@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useSettings, useUpdateSettings } from '@/hooks/useSettings'
+import { useMe, useChangeCredentials } from '@/hooks/useAuth'
 import { ErrorMessage } from '@/components/common/ErrorMessage'
 import type { AppSettingsRequest, AppSettingsResponse } from '@/api/types'
 
@@ -242,11 +243,60 @@ function CredentialField({
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+interface AccountFormState {
+  newUsername: string
+  currentPassword: string
+  newPassword: string
+  confirmPassword: string
+}
+
+const emptyAccount: AccountFormState = {
+  newUsername: '',
+  currentPassword: '',
+  newPassword: '',
+  confirmPassword: '',
+}
+
 export function SettingsPage() {
   const { data: settings, isLoading, isError, error: loadError, refetch } = useSettings()
   const update = useUpdateSettings()
   const [form, setForm] = useState<FormState | null>(null)
   const [savedOk, setSavedOk] = useState(false)
+
+  const { data: me } = useMe()
+  const changeCredentials = useChangeCredentials()
+  const [accountForm, setAccountForm] = useState<AccountFormState>(emptyAccount)
+  const [accountSavedOk, setAccountSavedOk] = useState(false)
+  const [accountError, setAccountError] = useState('')
+
+  function setAccount<K extends keyof AccountFormState>(key: K, value: AccountFormState[K]) {
+    setAccountForm((prev) => ({ ...prev, [key]: value }))
+  }
+
+  function handleAccountSave() {
+    if (accountForm.newPassword && accountForm.newPassword !== accountForm.confirmPassword) {
+      setAccountError('Passwords do not match')
+      return
+    }
+    setAccountError('')
+    changeCredentials.mutate(
+      {
+        currentPassword: accountForm.currentPassword,
+        newUsername: accountForm.newUsername || undefined,
+        newPassword: accountForm.newPassword || undefined,
+      },
+      {
+        onSuccess: () => {
+          setAccountSavedOk(true)
+          setTimeout(() => setAccountSavedOk(false), 2500)
+          setAccountForm(emptyAccount)
+        },
+        onError: (err) => {
+          setAccountError(err.message || 'Failed to update credentials')
+        },
+      },
+    )
+  }
 
   // Initialize form once when settings load
   useEffect(() => {
@@ -708,7 +758,7 @@ export function SettingsPage() {
           </div>
         </div>
 
-        {/* ── Heartbeat ──────────────────────────────────────────────────── */}
+        {/* ── Heartbeat (keep existing) ──────────────────────────────────── */}
         <div className="rounded-lg border" style={sectionSt}>
           <div className="px-5 py-4">
             <div className="flex items-center justify-between">
@@ -767,6 +817,107 @@ export function SettingsPage() {
                 </div>
               </div>
             )}
+          </div>
+        </div>
+        {/* ── Account ────────────────────────────────────────────────────── */}
+        <div className="rounded-lg border" style={sectionSt}>
+          <div className="px-5 py-4">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-sm font-semibold flex items-center gap-1.5" style={{ color: 'var(--text-primary)' }}>
+                  Account
+                  {me?.username && (
+                    <>
+                      <span style={{ color: 'var(--text-muted)' }}>·</span>
+                      <span style={{ color: 'var(--text-muted)' }}>{me.username}</span>
+                    </>
+                  )}
+                </h2>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                  Change your login credentials
+                </p>
+              </div>
+              <button
+                onClick={handleAccountSave}
+                disabled={changeCredentials.isPending || !accountForm.currentPassword}
+                className="px-4 py-2 text-sm font-medium rounded-md transition-colors disabled:opacity-60"
+                style={{
+                  backgroundColor: accountSavedOk ? 'var(--success)' : 'var(--accent)',
+                  color: '#fff',
+                }}
+              >
+                {changeCredentials.isPending ? 'Saving…' : accountSavedOk ? 'Saved' : 'Save'}
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium mb-1" style={labelSt}>
+                  New username{' '}
+                  <span style={{ color: 'var(--text-muted)' }}>(leave blank to keep current)</span>
+                </label>
+                <input
+                  className={inputCls}
+                  style={inputSt}
+                  value={accountForm.newUsername}
+                  onChange={(e) => setAccount('newUsername', e.target.value)}
+                  autoComplete="off"
+                  autoCorrect="off"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium mb-1" style={labelSt}>
+                  Current password{' '}
+                  <span style={{ color: 'var(--error)' }}>*</span>
+                </label>
+                <input
+                  type="password"
+                  className={inputCls}
+                  style={inputSt}
+                  value={accountForm.currentPassword}
+                  onChange={(e) => setAccount('currentPassword', e.target.value)}
+                  autoComplete="current-password"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium mb-1" style={labelSt}>
+                  New password{' '}
+                  <span style={{ color: 'var(--text-muted)' }}>(leave blank to keep current)</span>
+                </label>
+                <input
+                  type="password"
+                  className={inputCls}
+                  style={inputSt}
+                  value={accountForm.newPassword}
+                  onChange={(e) => setAccount('newPassword', e.target.value)}
+                  autoComplete="new-password"
+                />
+              </div>
+
+              {accountForm.newPassword && (
+                <div>
+                  <label className="block text-xs font-medium mb-1" style={labelSt}>
+                    Confirm new password
+                  </label>
+                  <input
+                    type="password"
+                    className={inputCls}
+                    style={inputSt}
+                    value={accountForm.confirmPassword}
+                    onChange={(e) => setAccount('confirmPassword', e.target.value)}
+                    autoComplete="new-password"
+                  />
+                </div>
+              )}
+
+              {accountError && (
+                <p className="text-xs" style={{ color: 'var(--error)' }}>
+                  {accountError}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>

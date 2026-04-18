@@ -31,6 +31,7 @@ export class ApiError extends Error {
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...init?.headers,
@@ -39,6 +40,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   })
 
   if (!res.ok) {
+    if (res.status === 401 && window.location.pathname !== '/login' && path !== '/api/auth/me') {
+      window.location.href = '/login'
+      return undefined as T
+    }
     let message = res.statusText
     try {
       const body = await res.json() as { message?: string; error?: string }
@@ -179,4 +184,26 @@ export const historyApi = {
 
   delete: (id: number) =>
     request<void>(`/api/backup-history/${id}`, { method: 'DELETE' }),
+}
+
+// ──────────────────────────────────────────
+// Auth
+// ──────────────────────────────────────────
+
+export const authApi = {
+  me: () => request<{ username: string }>('/api/auth/me'),
+
+  login: (username: string, password: string, rememberMe: boolean) =>
+    request<{ username: string }>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password, rememberMe }),
+    }),
+
+  logout: () => request<void>('/api/auth/logout', { method: 'POST' }),
+
+  changeCredentials: (currentPassword: string, newUsername?: string, newPassword?: string) =>
+    request<void>('/api/auth/credentials', {
+      method: 'PUT',
+      body: JSON.stringify({ currentPassword, newUsername, newPassword }),
+    }),
 }

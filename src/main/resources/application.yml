@@ -28,6 +28,10 @@ spring:
 server:
   port: 8080
 
+app:
+  security:
+    remember-me-key: ${APP_SECURITY_REMEMBER_ME_KEY:default-super-puper-key-change-it}
+
 backup-manager:
   cors:
     allowed-origins: "*"   # Override via env: BACKUP_MANAGER_CORS_ALLOWED_ORIGINS=https://myhost.com,https://other.com

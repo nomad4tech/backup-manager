@@ -1,6 +1,7 @@
-import { NavLink } from 'react-router-dom'
-import { Database, Github, History, Server, Settings } from 'lucide-react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { Database, Github, History, LogOut, Server, Settings } from 'lucide-react'
 import { useSettings } from '@/hooks/useSettings'
+import { useLogout } from '@/hooks/useAuth'
 
 interface NavItem {
   to: string
@@ -50,6 +51,29 @@ function IntegrationStatus() {
           )
         })}
       </div>
+  )
+}
+
+function LogoutButton() {
+  const logout = useLogout()
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    logout.mutate(undefined, {
+      onSettled: () => navigate('/login'),
+    })
+  }
+
+  return (
+    <button
+      onClick={handleLogout}
+      disabled={logout.isPending}
+      className="flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors w-full disabled:opacity-50"
+      style={{ color: 'var(--text-secondary)', backgroundColor: 'transparent' }}
+    >
+      <LogOut className="w-4 h-4" />
+      <span>Sign out</span>
+    </button>
   )
 }
 
@@ -121,7 +145,8 @@ export function Sidebar() {
             <span>Settings</span>
           </NavLink>
           <div className="-mx-3 border-b my-2" style={{ borderColor: 'var(--border)', opacity: 0.5 }} />
-          <div className="mt-2">
+          <LogoutButton />
+          <div className="mt-1">
             <a
               href="https://github.com/nomad4tech/backup-manager"
               target="_blank"
