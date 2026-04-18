@@ -37,14 +37,14 @@
 
     <repositories>
         <repository>
-            <id>github</id>
-            <url>https://maven.pkg.github.com/nomad4tech/docker-socket-manager</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
     <dependencies>
         <dependency>
-            <groupId>tech.nomad4</groupId>
+            <groupId>com.github.nomad4tech</groupId>
             <artifactId>docker-socket-manager</artifactId>
             <version>0.1.0</version>
         </dependency>
