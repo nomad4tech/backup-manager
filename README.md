@@ -94,7 +94,7 @@ No credentials are stored in config files. PostgreSQL uses `$POSTGRES_USER`, MyS
 ---
 
 ## Known Limitations
-
+- **Early stage** - actively developed and tested by single maintainer; edge cases and environment-specific bugs may exist; feedback and bug reports are welcome
 - **No HTTPS** - run behind reverse proxy (Nginx + Let's Encrypt, Caddy, or Cloudflare Tunnel) in production; don't expose application port directly to the internet
 - **No progress indicator** - large backups show `RUNNING` until complete
 - **SSH transfers are slow** - all dump data travels through the tunnel; schedule large remote backups off-peak
