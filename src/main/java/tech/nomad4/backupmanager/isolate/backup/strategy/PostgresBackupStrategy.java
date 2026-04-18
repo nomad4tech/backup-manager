@@ -105,6 +105,9 @@ public class PostgresBackupStrategy implements BackupStrategy {
 
         } catch (BackupException e) {
             throw e;
+        } catch (com.github.dockerjava.api.exception.ConflictException e) {
+            throw new BackupException(
+                    "Failed to connect container: " + command.getContainerId(), e);
         } catch (IOException e) {
             throw new BackupException("Failed to open output file: " + outputPath, e);
         } catch (InterruptedException e) {
