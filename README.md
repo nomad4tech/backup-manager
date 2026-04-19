@@ -112,6 +112,7 @@ No credentials are stored in config files. PostgreSQL uses `$POSTGRES_USER`, MyS
 - [ ] Slack notifications
 - [ ] MongoDB support
 - [ ] Backup encryption
+- [ ] Setting import/export
 
 ---
 
