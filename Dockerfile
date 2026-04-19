@@ -36,15 +36,16 @@ FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-RUN mkdir -p /data /app/backups && \
-    addgroup -S appgroup && \
-    adduser -S appuser -G appgroup && \
+RUN apk add --no-cache su-exec && \
+    addgroup -g 1000 appgroup && \
+    adduser -u 1000 -G appgroup -S appuser && \
+    mkdir -p /data /app/backups && \
     chown appuser:appgroup /data /app/backups
 
 COPY --from=backend-builder /app/target/backup-manager-*.jar app.jar
-
-USER appuser
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["/entrypoint.sh"]
