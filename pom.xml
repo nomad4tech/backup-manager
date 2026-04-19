@@ -46,7 +46,7 @@
         <dependency>
             <groupId>com.github.nomad4tech</groupId>
             <artifactId>docker-socket-manager</artifactId>
-            <version>0.1.0</version>
+            <version>0.1.1</version>
         </dependency>
 
         <!-- Spring Boot Web -->
