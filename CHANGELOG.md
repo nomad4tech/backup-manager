@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1] - 2026-04-19
+
+### Fixed
+- Backup directory creation failing when mounted volume is owned by root - container now runs entrypoint as root, fixes permissions, then switches to appuser
+- Version number corrected in package.json and Sidebar UI (was 0.0.0 / 1.0.0)
+
+---
+
 ## [0.1.0] - 2026-04-18
 
 ### Added
