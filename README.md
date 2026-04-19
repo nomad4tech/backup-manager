@@ -73,10 +73,10 @@ No credentials are stored in config files. PostgreSQL uses `$POSTGRES_USER`, MyS
 
 ## Supported Databases
 
-| Database  | Backup tool                  |
-|-----------|------------------------------|
-| PostgreSQL | `pg_dump`                   |
-| MySQL      | `mysqldump`                 |
+| Database   | Backup tool                  |
+|------------|------------------------------|
+| PostgreSQL | `pg_dump`                    |
+| MySQL      | `mysqldump`                  |
 | MariaDB    | `mysqldump` / `mariadb-dump` |
 
 ---
@@ -90,6 +90,7 @@ No credentials are stored in config files. PostgreSQL uses `$POSTGRES_USER`, MyS
 | `BACKUP_MANAGER_BACKUP_MIN_FREE_SPACE_BYTES` | `536870912` | Min free space before dump (bytes) |
 | `BACKUP_MANAGER_BACKUP_DEFAULT_TIMEOUT` | `3600` | Max seconds per dump before it's interrupted |
 | `BACKUP_MANAGER_CORS_ALLOWED_ORIGINS` | `*` | Restrict CORS origins in production |
+| `APP_SECURITY_REMEMBER_ME_KEY` | `bkpmgr-default-key-change-in-production` | Secret key for remember-me cookie signing; change in production |
 
 ---
 
@@ -103,12 +104,13 @@ No credentials are stored in config files. PostgreSQL uses `$POSTGRES_USER`, MyS
 ---
 
 ## Roadmap
-
+> No specific priority or timeline. Features are added as time and interest allow
 - [ ] Restore from backup via UI
-- [ ] Authentication / access control
-- [ ] Progress indicator
-- [ ] MongoDB support
+- [ ] Progress indicator for running backups
+- [ ] Notification webhooks
 - [ ] Telegram notifications
+- [ ] Slack notifications
+- [ ] MongoDB support
 - [ ] Backup encryption
 
 ---
