@@ -13,8 +13,6 @@ import type {
   UpdateSocketRequest,
 } from './types'
 
-const BASE_URL = 'http://localhost:8080'
-
 // ──────────────────────────────────────────
 // Base fetch wrapper
 // ──────────────────────────────────────────
@@ -30,7 +28,7 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const res = await fetch(path, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
@@ -139,7 +137,7 @@ export const tasksApi = {
     request<void>(`/api/backup-tasks/${id}`, { method: 'DELETE' }),
 
   forceRun: (id: number) =>
-    fetch(`${BASE_URL}/api/scheduler/tasks/${id}/run`, { method: 'POST' }),
+    fetch(`/api/scheduler/tasks/${id}/run`, { method: 'POST' }),
 }
 
 // ──────────────────────────────────────────

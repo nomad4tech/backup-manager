@@ -154,7 +154,7 @@ export function Sidebar() {
               className="flex items-center justify-between"
               style={{ color: 'var(--text-muted)', opacity: 0.45, fontSize: '0.7rem', textDecoration: 'none' }}
             >
-              <span>v0.1.1 · GitHub</span>
+              <span>v0.1.2 · GitHub</span>
               <Github className="w-3 h-3" />
             </a>
           </div>

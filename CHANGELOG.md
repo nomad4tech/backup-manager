@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.2] - 2026-04-20
+
+### Fixed
+- API requests used hardcoded `http://localhost:8080` base URL,
+  causing CORS failure when app is accessed by server IP or domain
+
+---
+
 ## [0.1.1] - 2026-04-19
 
 ### Fixed
