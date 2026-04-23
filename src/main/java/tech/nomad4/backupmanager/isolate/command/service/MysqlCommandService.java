@@ -37,10 +37,14 @@ import java.util.UUID;
  *
  * <h3>MariaDB compatibility</h3>
  * MariaDB images accept {@code $MYSQL_ROOT_PASSWORD} alongside their own
- * {@code $MARIADB_ROOT_PASSWORD}, so this service works for both engines.
+ * {@code $MARIADB_ROOT_PASSWORD}. Some images ship only the {@code mariadb} CLI
+ * and not {@code mysql}. This service tries {@code mysql} first and falls back to
+ * {@code mariadb} automatically if the CLI is not found.
  */
 @Slf4j
 public class MysqlCommandService implements DatabaseCommandService {
+
+    private static final String[] CLI_CANDIDATES = {"mysql", "mariadb"};
 
     private final DockerExecExecutor executor;
     private final AsyncOperationManager operationManager;
@@ -55,36 +59,51 @@ public class MysqlCommandService implements DatabaseCommandService {
     @Override
     public CommandResult execute(DockerClient client, String containerId, DatabaseCommand command) {
         log.info("Executing command in container {}: {}", containerId, command.getSummary());
-
-        String[] execCommand = buildExecCommand(command);
         long timeout = resolveTimeout(command);
 
-        try {
-            CommandResult result = executor.execute(client, containerId, execCommand, timeout, command.getEnv());
-            result.setOperationId(UUID.randomUUID().toString());
-
-            log.info("Command completed in {}ms with exit code {} in container {}",
-                    result.getExecutionTimeMs(), result.getExitCode(), containerId);
-
-            return result;
-
-        } catch (Exception e) {
-            log.error("Command execution failed in container {}: {}", containerId, e.getMessage());
-            throw new CommandExecutionException("Failed to execute command", e);
+        for (String cli : CLI_CANDIDATES) {
+            String[] execCommand = buildExecCommandWithCli(command, cli);
+            try {
+                CommandResult result = executor.execute(client, containerId, execCommand, timeout, command.getEnv());
+                if (isMysqlNotFound(result) && "mysql".equals(cli)) {
+                    log.info("mysql not found in container {}, retrying with mariadb CLI", containerId);
+                    continue;
+                }
+                result.setOperationId(UUID.randomUUID().toString());
+                log.info("Command completed in {}ms with exit code {} in container {}",
+                        result.getExecutionTimeMs(), result.getExitCode(), containerId);
+                return result;
+            } catch (Exception e) {
+                if ("mariadb".equals(cli)) {
+                    log.error("Command execution failed in container {}: {}", containerId, e.getMessage());
+                    throw new CommandExecutionException("Failed to execute command", e);
+                }
+                log.warn("mysql CLI failed in container {}, trying mariadb", containerId);
+            }
         }
+        throw new CommandExecutionException(
+                "Neither mysql nor mariadb CLI found in container " + containerId);
     }
 
     @Override
     public String executeAsync(DockerClient client, String containerId, DatabaseCommand command) {
         log.info("Submitting async command for container {}: {}", containerId, command.getSummary());
-
-        String[] execCommand = buildExecCommand(command);
         long timeout = resolveTimeout(command);
 
         return operationManager.submit(
                 containerId,
                 command,
-                () -> executor.execute(client, containerId, execCommand, timeout, command.getEnv())
+                () -> {
+                    for (String cli : CLI_CANDIDATES) {
+                        String[] execCommand = buildExecCommandWithCli(command, cli);
+                        CommandResult result = executor.execute(
+                                client, containerId, execCommand, timeout, command.getEnv());
+                        if (isMysqlNotFound(result) && "mysql".equals(cli)) continue;
+                        return result;
+                    }
+                    throw new CommandExecutionException(
+                            "Neither mysql nor mariadb CLI found in container " + containerId);
+                }
         );
     }
 
@@ -132,7 +151,7 @@ public class MysqlCommandService implements DatabaseCommandService {
                 String trimmed = line.trim();
                 if (!trimmed.isEmpty()) {
                     if ("NULL".equalsIgnoreCase(trimmed)) {
-                        return 0L;  // schema exists but has no tables yet
+                        return 0L;
                     }
                     try {
                         return Long.parseLong(trimmed);
@@ -151,35 +170,20 @@ public class MysqlCommandService implements DatabaseCommandService {
     // Command building
     // ------------------------------------------------------------------
 
-    private String[] buildExecCommand(DatabaseCommand command) {
+    private String[] buildExecCommandWithCli(DatabaseCommand command, String cli) {
         return switch (command.getType()) {
-            case SQL   -> buildSqlCommand(command);
+            case SQL   -> buildSqlCommand(command, cli);
             case SHELL -> command.getArgs().toArray(new String[0]);
             case RAW   -> command.getArgs().toArray(new String[0]);
         };
     }
 
-    /**
-     * Wraps a SQL query in a {@code mysql} CLI invocation.
-     * <p>
-     * Runs as {@code root} with the password sourced from {@code $MYSQL_ROOT_PASSWORD}.
-     * The password is passed via the {@code MYSQL_PWD} environment variable rather
-     * than the {@code -p} flag, which avoids the
-     * {@code "Warning: Using a password on the command line interface can be insecure"}
-     * message and preserves the correct exit code (piping through {@code grep} to strip
-     * the warning would swallow the mysql exit code on failure).
-     * </p>
-     * <p>
-     * The command is executed via {@code sh -c} so {@code $MYSQL_ROOT_PASSWORD} is
-     * resolved by the container's shell at runtime, not by the JVM.
-     * </p>
-     */
-    private String[] buildSqlCommand(DatabaseCommand command) {
+    private String[] buildSqlCommand(DatabaseCommand command, String cli) {
         List<String> args = command.getArgs();
         String sql = args.get(0);
 
         StringBuilder mysqlCmd = new StringBuilder();
-        mysqlCmd.append("MYSQL_PWD=\"$MYSQL_ROOT_PASSWORD\" mysql -u root");
+        mysqlCmd.append("MYSQL_PWD=\"$MYSQL_ROOT_PASSWORD\" ").append(cli).append(" -u root");
 
         for (int i = 1; i < args.size(); i++) {
             mysqlCmd.append(' ').append(shellQuote(args.get(i)));
@@ -188,6 +192,19 @@ public class MysqlCommandService implements DatabaseCommandService {
         mysqlCmd.append(" -e ").append(shellQuote(sql));
 
         return new String[]{"sh", "-c", mysqlCmd.toString()};
+    }
+
+    // ------------------------------------------------------------------
+    // Helpers
+    // ------------------------------------------------------------------
+
+    private boolean isMysqlNotFound(CommandResult result) {
+        if (result == null) return false;
+        String stderr = result.getError();
+        if (stderr == null) return false;
+        return stderr.contains("mysql: not found")
+                || stderr.contains("mysql: command not found")
+                || stderr.contains("No such file or directory");
     }
 
     private String shellQuote(String value) {

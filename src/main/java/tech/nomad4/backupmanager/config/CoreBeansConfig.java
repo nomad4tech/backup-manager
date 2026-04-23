@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import tech.nomad4.backupmanager.isolate.awsbucket.service.AwsBucketService;
 import tech.nomad4.backupmanager.isolate.backup.service.BackupExecutionService;
 import tech.nomad4.backupmanager.isolate.backup.strategy.BackupStrategy;
+import tech.nomad4.backupmanager.isolate.backup.strategy.MariadbBackupStrategy;
 import tech.nomad4.backupmanager.isolate.backup.strategy.MysqlBackupStrategy;
 import tech.nomad4.backupmanager.isolate.backup.strategy.PostgresBackupStrategy;
 import tech.nomad4.backupmanager.isolate.email.service.EmailService;
@@ -109,6 +110,11 @@ public class CoreBeansConfig {
     @Bean
     public MysqlBackupStrategy mysqlBackupStrategy() {
         return new MysqlBackupStrategy();
+    }
+
+    @Bean
+    public MariadbBackupStrategy mariadbBackupStrategy(MysqlBackupStrategy mysqlBackupStrategy) {
+        return new MariadbBackupStrategy(mysqlBackupStrategy);
     }
 
     @Bean
