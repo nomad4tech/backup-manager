@@ -102,6 +102,7 @@ public class AppSettingsValidationService {
                 .secretKey(settings.getAwsSecretKey())
                 .endpoint(settings.getAwsEndpoint())
                 .pathStyleAccess(settings.isAwsPathStyleAccess())
+                .destinationDirectory(settings.getAwsDestinationDirectory())
                 .build();
 
         BucketCheckResult result = awsBucketService.checkConnection(config);

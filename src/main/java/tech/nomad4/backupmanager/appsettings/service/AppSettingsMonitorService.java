@@ -20,7 +20,7 @@ import java.util.List;
  * email notification when failures are detected.
  *
  * <h3>Schedule</h3>
- * <p>Runs every 5 minutes. Validation results are persisted by
+ * <p>Runs every 15 minutes. Validation results are persisted by
  * {@link AppSettingsValidationService}.</p>
  *
  * <h3>Notification rules</h3>
@@ -67,7 +67,7 @@ public class AppSettingsMonitorService {
      *       (subject to email availability and cooldown).</li>
      * </ol>
      */
-    @Scheduled(fixedRate = 300_000)
+    @Scheduled(fixedRate = 900_000)
     public void monitor() {
         AppSettings settings = appSettingsService.get();
         settings = validationService.validate(settings);

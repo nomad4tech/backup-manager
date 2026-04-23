@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSettings, useUpdateSettings } from '@/hooks/useSettings'
 import { useMe, useChangeCredentials } from '@/hooks/useAuth'
 import { ErrorMessage } from '@/components/common/ErrorMessage'
-import type { AppSettingsRequest, AppSettingsResponse } from '@/api/types'
+import { checkAwsConnection } from '@/api/client'
+import type { AppSettingsRequest, AppSettingsResponse, BucketCheckResult } from '@/api/types'
 
 // ─── Form state ──────────────────────────────────────────────────────────────
 
@@ -262,6 +263,9 @@ export function SettingsPage() {
   const update = useUpdateSettings()
   const [form, setForm] = useState<FormState | null>(null)
   const [savedOk, setSavedOk] = useState(false)
+  const [awsCheckResult, setAwsCheckResult] = useState<BucketCheckResult | null>(null)
+  const [awsChecking, setAwsChecking] = useState(false)
+  const awsCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const { data: me } = useMe()
   const changeCredentials = useChangeCredentials()
@@ -305,6 +309,33 @@ export function SettingsPage() {
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => (prev ? { ...prev, [key]: value } : prev))
+    setAwsCheckResult(null)
+    if (awsCheckTimerRef.current) clearTimeout(awsCheckTimerRef.current)
+  }
+
+  async function handleAwsCheck() {
+    if (!form) return
+    setAwsChecking(true)
+    setAwsCheckResult(null)
+    if (awsCheckTimerRef.current) clearTimeout(awsCheckTimerRef.current)
+    try {
+      const result = await checkAwsConnection({
+        bucketName: form.awsBucketName,
+        region: form.awsRegion,
+        accessKey: form.awsAccessKey,
+        awsSecretKey: form.awsSecretKey,
+        endpoint: form.awsEndpoint || undefined,
+        pathStyleAccess: form.awsPathStyleAccess,
+        destinationDirectory: form.awsDestinationDirectory || undefined,
+      })
+      setAwsCheckResult(result)
+      awsCheckTimerRef.current = setTimeout(() => setAwsCheckResult(null), 10_000)
+    } catch {
+      setAwsCheckResult({ bucketName: form.awsBucketName, reachable: false, errorMessage: 'Request failed' })
+      awsCheckTimerRef.current = setTimeout(() => setAwsCheckResult(null), 10_000)
+    } finally {
+      setAwsChecking(false)
+    }
   }
 
   function handleSave() {
@@ -637,7 +668,24 @@ export function SettingsPage() {
               </div>
               <div className="flex items-center gap-3">
                 {form.awsEnabled && (
-                  <ConnectionBadge valid={settings.awsConnectionValid} />
+                  awsCheckResult !== null
+                    ? <ConnectionBadge valid={awsCheckResult.reachable} />
+                    : <ConnectionBadge valid={settings.awsConnectionValid} />
+                )}
+                {form.awsEnabled && (
+                  <button
+                    type="button"
+                    onClick={handleAwsCheck}
+                    disabled={awsChecking}
+                    className="px-3 py-1.5 text-xs font-medium rounded-md border transition-colors disabled:opacity-60"
+                    style={{
+                      borderColor: 'var(--border)',
+                      color: 'var(--text-secondary)',
+                      backgroundColor: 'transparent',
+                    }}
+                  >
+                    {awsChecking ? 'Checking…' : 'Check'}
+                  </button>
                 )}
                 <Toggle
                   enabled={form.awsEnabled}

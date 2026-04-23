@@ -1,8 +1,10 @@
 import type {
   AppSettingsRequest,
   AppSettingsResponse,
+  AwsCheckRequest,
   BackupRecord,
   BackupTask,
+  BucketCheckResult,
   ContainerInfo,
   CreateBackupTaskRequest,
   CreateSocketRequest,
@@ -168,6 +170,13 @@ export const settingsApi = {
       method: 'PUT',
       body: JSON.stringify(data),
     }),
+}
+
+export async function checkAwsConnection(req: AwsCheckRequest): Promise<BucketCheckResult> {
+  return request<BucketCheckResult>('/api/settings/aws/check', {
+    method: 'POST',
+    body: JSON.stringify(req),
+  })
 }
 
 // ──────────────────────────────────────────

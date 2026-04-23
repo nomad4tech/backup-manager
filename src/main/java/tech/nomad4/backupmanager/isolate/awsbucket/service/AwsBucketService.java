@@ -7,7 +7,6 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Configuration;
-import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import tech.nomad4.backupmanager.isolate.awsbucket.dto.BucketCheckResult;
@@ -159,10 +158,18 @@ public class AwsBucketService {
         log.info("Checking connection: bucket={}, region={}, endpoint={}",
                 config.getBucketName(), config.getRegion(), config.getEndpoint());
 
+        String probeKey = (config.getDestinationDirectory() != null && !config.getDestinationDirectory().isBlank())
+                ? config.getDestinationDirectory() + "/backup-manager-probe.tmp"
+                : "backup-manager-probe.tmp";
+
         try (S3Client s3 = buildClient(config)) {
-            s3.headBucket(HeadBucketRequest.builder()
-                    .bucket(config.getBucketName())
-                    .build());
+            s3.putObject(
+                    PutObjectRequest.builder()
+                            .bucket(config.getBucketName())
+                            .key(probeKey)
+                            .build(),
+                    RequestBody.empty()
+            );
 
             log.info("Connection check passed: bucket={}", config.getBucketName());
 

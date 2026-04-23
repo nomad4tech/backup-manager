@@ -11,9 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tech.nomad4.backupmanager.appsettings.dto.AppSettingsRequest;
 import tech.nomad4.backupmanager.appsettings.dto.AppSettingsResponse;
+import tech.nomad4.backupmanager.appsettings.dto.AwsCheckRequest;
 import tech.nomad4.backupmanager.appsettings.entity.AppSettings;
 import tech.nomad4.backupmanager.appsettings.service.AppSettingsService;
 import tech.nomad4.backupmanager.appsettings.service.AppSettingsValidationService;
+import tech.nomad4.backupmanager.isolate.awsbucket.dto.BucketCheckResult;
+import tech.nomad4.backupmanager.isolate.awsbucket.dto.BucketConfig;
+import tech.nomad4.backupmanager.isolate.awsbucket.service.AwsBucketService;
 
 /**
  * REST controller for reading and updating global application settings.
@@ -29,6 +33,7 @@ public class AppSettingsController {
 
     private final AppSettingsService service;
     private final AppSettingsValidationService validationService;
+    private final AwsBucketService awsBucketService;
 
     @Operation(
             summary = "Get current application settings",
@@ -57,6 +62,32 @@ public class AppSettingsController {
         AppSettings saved = service.update(request);
         AppSettings validated = validationService.validate(saved);
         return ResponseEntity.ok(AppSettingsResponse.from(validated));
+    }
+
+    @Operation(
+            summary = "Check AWS S3 connectivity",
+            description = "Immediately checks S3 connectivity using credentials from the request body. " +
+                    "Pass awsSecretKey=null to use the stored secret key from the database."
+    )
+    @ApiResponse(responseCode = "200",
+            content = @Content(schema = @Schema(implementation = BucketCheckResult.class)))
+    @PostMapping("/aws/check")
+    public ResponseEntity<BucketCheckResult> checkAws(@RequestBody AwsCheckRequest request) {
+        String secretKey = request.getAwsSecretKey() != null
+                ? request.getAwsSecretKey()
+                : service.get().getAwsSecretKey();
+
+        BucketConfig config = BucketConfig.builder()
+                .bucketName(request.getBucketName())
+                .region(request.getRegion())
+                .accessKey(request.getAccessKey())
+                .secretKey(secretKey)
+                .endpoint(request.getEndpoint())
+                .pathStyleAccess(request.isPathStyleAccess())
+                .destinationDirectory(request.getDestinationDirectory())
+                .build();
+
+        return ResponseEntity.ok(awsBucketService.checkConnection(config));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

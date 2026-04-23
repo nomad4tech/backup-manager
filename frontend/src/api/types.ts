@@ -178,6 +178,22 @@ export interface AppSettingsResponse {
   updatedAt: string | null
 }
 
+export interface AwsCheckRequest {
+  bucketName: string
+  region: string
+  accessKey: string
+  awsSecretKey: string | null
+  endpoint?: string
+  pathStyleAccess: boolean
+  destinationDirectory?: string
+}
+
+export interface BucketCheckResult {
+  bucketName: string
+  reachable: boolean
+  errorMessage?: string
+}
+
 export interface AppSettingsRequest {
   // Email
   emailEnabled: boolean

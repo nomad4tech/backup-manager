@@ -53,4 +53,11 @@ public class BucketConfig {
      * Required for MinIO and some other S3-compatible services.
      */
     private boolean pathStyleAccess;
+
+    /**
+     * Optional prefix directory inside the bucket.
+     * When set, probe and upload keys are placed under this directory.
+     */
+    @Builder.Default
+    private String destinationDirectory = null;
 }
