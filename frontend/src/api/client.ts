@@ -114,6 +114,16 @@ export const discoveryApi = {
     ),
 }
 
+export async function getDatabaseSize(
+  socketId: number,
+  containerId: string,
+  databaseName: string,
+): Promise<number> {
+  return request<number>(
+    `/api/discovery/sockets/${socketId}/containers/${containerId}/databases/${encodeURIComponent(databaseName)}/size`,
+  )
+}
+
 // ──────────────────────────────────────────
 // Backup Tasks
 // ──────────────────────────────────────────

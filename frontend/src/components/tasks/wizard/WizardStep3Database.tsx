@@ -3,6 +3,44 @@ import { useNavigate } from 'react-router-dom'
 import { ErrorMessage } from '@/components/common/ErrorMessage'
 import { useDatabases } from '@/hooks/useDatabases'
 import { useTasks } from '@/hooks/useTasks'
+import { useDatabaseSize } from '@/hooks/useDatabaseSize'
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`
+}
+
+interface DbSizeLabelProps {
+  socketId: number
+  containerId: string
+  databaseName: string
+}
+
+function DbSizeLabel({ socketId, containerId, databaseName }: DbSizeLabelProps) {
+  const state = useDatabaseSize(socketId, containerId, databaseName)
+
+  if (state.status === 'loading') {
+    return (
+      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
+        …
+      </span>
+    )
+  }
+  if (state.status === 'error') {
+    return (
+      <span className="text-xs" style={{ color: 'var(--error)' }}>
+        error
+      </span>
+    )
+  }
+  return (
+    <span className="text-xs font-mono" style={{ color: 'var(--text-muted)' }}>
+      {formatBytes(state.bytes)}
+    </span>
+  )
+}
 
 interface WizardStep3DatabaseProps {
   socketId: number
@@ -101,10 +139,12 @@ export function WizardStep3Database({
           <span className="text-sm font-mono" style={{ color: 'var(--text-primary)' }}>
             {db}
           </span>
-          {selectedDatabase === db && (
+          {selectedDatabase === db ? (
             <span className="text-xs" style={{ color: 'var(--accent)' }}>
               Click again to continue
             </span>
+          ) : (
+            <DbSizeLabel socketId={socketId} containerId={containerId} databaseName={db} />
           )}
         </button>
       ))}

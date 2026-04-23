@@ -159,6 +159,41 @@ public class DiscoveryController {
     }
 
     // -------------------------------------------------------------------------
+    // Database size
+    // -------------------------------------------------------------------------
+
+    @Operation(
+            summary = "Get database size",
+            description = "Queries the on-disk size of a specific database inside the container. " +
+                    "Returns size in bytes."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200",
+                    content = @Content(schema = @Schema(type = "integer", format = "int64"))),
+            @ApiResponse(responseCode = "404", description = "Socket or container not found",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "502", description = "In-container query failed",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "503", description = "Cannot connect to Docker host",
+                    content = @Content(schema = @Schema(implementation = String.class)))
+    })
+    @GetMapping("/sockets/{socketId}/containers/{containerId}/databases/{databaseName}/size")
+    public ResponseEntity<Long> getDatabaseSize(
+            @Parameter(description = "Socket ID", example = "1")
+            @PathVariable Long socketId,
+            @Parameter(description = "Container ID (short or full)", example = "a1b2c3d4e5f6")
+            @PathVariable String containerId,
+            @Parameter(description = "Database name", example = "mydb")
+            @PathVariable String databaseName) {
+
+        var client = socketFacade.getDockerClient(socketId);
+        ContainerInfo info = discoveryService.getContainerInfo(client, containerId);
+        long size = databaseListService.getDatabaseSize(
+                client, containerId, info.getDatabaseType(), databaseName);
+        return ResponseEntity.ok(size);
+    }
+
+    // -------------------------------------------------------------------------
     // Supported types
     // -------------------------------------------------------------------------
 

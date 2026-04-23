@@ -56,6 +56,22 @@ public class DatabaseListService {
         };
     }
 
+    /**
+     * Returns the on-disk size of the given database in bytes.
+     * Delegates to the engine-specific command service.
+     * Returns -1 if the database type does not support size queries.
+     *
+     * @throws CommandExecutionException if the in-container query fails
+     */
+    public long getDatabaseSize(DockerClient client, String containerId,
+                                DatabaseType dbType, String databaseName) {
+        return switch (dbType) {
+            case POSTGRES       -> postgresCommandService.getDatabaseSize(client, containerId, databaseName);
+            case MYSQL, MARIADB -> mysqlCommandService.getDatabaseSize(client, containerId, databaseName);
+            default             -> -1L;
+        };
+    }
+
     // -------------------------------------------------------------------------
     // Engine-specific implementations
     // -------------------------------------------------------------------------
