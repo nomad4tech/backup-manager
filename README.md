@@ -1,5 +1,4 @@
-# Backup Manager
-
+# <img src="frontend/public/favicon.svg" width="32" alt="icon"> Backup Manager
 A self-hosted web UI for scheduling and managing database backups in Docker environments.
 
 Connect your Docker hosts, discover running databases automatically, and set up scheduled backups - without touching a config file.
@@ -21,6 +20,8 @@ Connect your Docker hosts, discover running databases automatically, and set up 
 - 💓 **Heartbeat** - periodic pings to UptimeRobot, Betterstack, etc.
 - 📜 **Backup history** - full log with status, duration, and file size
 - 🔐 **Authentication** - built-in login with session-based auth and remember me (30 days)
+- 🗜 **Compression** - gzip compression per task, enabled by default
+- ✏️ **Task editing** - edit schedule, compression, S3 upload, and retention directly from the task page
 
 ---
 
