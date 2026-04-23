@@ -288,6 +288,8 @@ public class BackupTaskService {
                 ? request.getDelayHours() * 3600L
                 : null);
         task.setKeepBackupsCount(request.getKeepBackupsCount());
+        task.setCompressionEnabled(request.getCompressionEnabled() != null ? request.getCompressionEnabled() : true);
+        task.setUploadToS3(request.getUploadToS3() != null ? request.getUploadToS3() : true);
         task.setEnabled(request.getEnabled() != null ? request.getEnabled() : true);
         if (!Boolean.TRUE.equals(task.getEnabled())) {
             task.setStatus(TaskStatus.DISABLED);

@@ -33,6 +33,8 @@ public class BackupTaskResponse {
     private final Integer delayHours;
 
     private final Integer keepBackupsCount;
+    private final boolean compressionEnabled;
+    private final boolean uploadToS3;
     private final Boolean enabled;
     private final TaskStatus status;
     private final String lastError;
@@ -59,6 +61,8 @@ public class BackupTaskResponse {
                 .cronExpression(task.getCronExpression())
                 .delayHours(toDelayHours(task.getDelaySeconds()))
                 .keepBackupsCount(task.getKeepBackupsCount())
+                .compressionEnabled(task.isCompressionEnabled())
+                .uploadToS3(task.isUploadToS3())
                 .enabled(task.getEnabled())
                 .status(task.getStatus())
                 .lastError(task.getLastError())

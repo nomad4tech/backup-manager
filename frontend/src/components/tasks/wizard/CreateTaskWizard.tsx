@@ -25,6 +25,8 @@ const DEFAULT_SCHEDULE: ScheduleConfig = {
   cronExpression: '0 3 * * *',
   delayHours: 1,
   keepBackupsCount: '',
+  compressionEnabled: true,
+  uploadToS3: true,
 }
 
 const STEPS = [
@@ -119,6 +121,8 @@ export function CreateTaskWizard() {
             ? state.schedule.delayHours
             : undefined,
         keepBackupsCount: keepCount,
+        compressionEnabled: state.schedule.compressionEnabled,
+        uploadToS3: state.schedule.uploadToS3,
       },
       {
         onSuccess: () => navigate('/tasks'),

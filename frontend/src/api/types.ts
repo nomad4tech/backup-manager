@@ -73,6 +73,8 @@ export interface BackupTask {
   cronExpression?: string
   delayHours?: number
   keepBackupsCount?: number
+  compressionEnabled: boolean
+  uploadToS3: boolean
   enabled: boolean
   status: TaskStatus
   lastError?: string
@@ -89,6 +91,8 @@ export interface CreateBackupTaskRequest {
   cronExpression?: string
   delayHours?: number
   keepBackupsCount?: number
+  compressionEnabled: boolean
+  uploadToS3: boolean
 }
 
 export type UpdateBackupTaskRequest = CreateBackupTaskRequest

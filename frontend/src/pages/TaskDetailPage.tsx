@@ -63,6 +63,8 @@ export function TaskDetailPage() {
                   value: task.nextScheduledAt ? formatDate(task.nextScheduledAt) : '-',
                 },
                 { label: 'Keep Backups', value: task.keepBackupsCount?.toString() ?? 'Unlimited' },
+                { label: 'Compression', value: task.compressionEnabled ? 'Enabled' : 'Disabled' },
+                { label: 'Upload to S3', value: task.uploadToS3 ? 'Enabled' : 'Disabled' },
               ].map(({ label, value, mono }) => (
                 <div key={label}>
                   <dt className="text-xs font-medium mb-0.5" style={{ color: 'var(--text-muted)' }}>

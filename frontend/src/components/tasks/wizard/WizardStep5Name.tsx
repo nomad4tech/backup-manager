@@ -103,6 +103,8 @@ export function WizardStep5Name({
                     label="Keep Backups"
                     value={schedule.keepBackupsCount ? `${schedule.keepBackupsCount} backups` : 'Unlimited'}
                 />
+                <SummaryRow label="Compression" value={schedule.compressionEnabled ? 'Enabled' : 'Disabled'} />
+                <SummaryRow label="Upload to S3" value={schedule.uploadToS3 ? 'Enabled' : 'Disabled'} />
             </div>
         </div>
     )

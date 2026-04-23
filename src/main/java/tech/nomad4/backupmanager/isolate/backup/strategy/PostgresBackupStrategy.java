@@ -136,11 +136,6 @@ public class PostgresBackupStrategy implements BackupStrategy {
             cmd.append(" -F ").append(shellQuote(opts.getFormat().getPgDumpFormat()));
         }
 
-        if (opts.getFormat() == BackupFormat.CUSTOM
-                && opts.getCompression() == CompressionType.GZIP) {
-            cmd.append(" -Z 9");
-        }
-
         if (opts.isVerbose()) {
             cmd.append(" -v");
         }
@@ -159,6 +154,10 @@ public class PostgresBackupStrategy implements BackupStrategy {
 
         cmd.append(' ').append(shellQuote(command.getDatabaseName()));
 
+        if (opts.getCompression() == CompressionType.GZIP && opts.getFormat() == BackupFormat.PLAIN) {
+            String script = "set -o pipefail; " + cmd + " | gzip";
+            return new String[]{"bash", "-c", script};
+        }
         return new String[]{"sh", "-c", cmd.toString()};
     }
 

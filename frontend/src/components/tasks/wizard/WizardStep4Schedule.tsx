@@ -7,6 +7,8 @@ export interface ScheduleConfig {
   cronExpression: string
   delayHours: number
   keepBackupsCount: string
+  compressionEnabled: boolean
+  uploadToS3: boolean
 }
 
 interface WizardStep4ScheduleProps {
@@ -28,6 +30,30 @@ const inputStyle = {
   backgroundColor: 'var(--bg-elevated)',
   borderColor: 'var(--border)',
   color: 'var(--text-muted)',
+}
+
+function Toggle({ enabled, onChange }: { enabled: boolean; onChange: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onChange}
+      className="relative w-9 h-5 rounded-full flex-shrink-0 transition-colors"
+      style={{
+        backgroundColor: enabled ? 'var(--accent)' : 'var(--bg-elevated)',
+        border: '1px solid',
+        borderColor: enabled ? 'var(--accent)' : 'var(--border)',
+      }}
+    >
+      <span
+        className="absolute top-0.5 h-4 w-4 rounded-full transition-transform"
+        style={{
+          left: '2px',
+          backgroundColor: '#fff',
+          transform: enabled ? 'translateX(16px)' : 'none',
+        }}
+      />
+    </button>
+  )
 }
 
 const DELAY_OPTIONS = [1, 2, 3, 4, 6, 8, 12, 24, 48, 72, 168]
@@ -143,6 +169,34 @@ export function WizardStep4Schedule({ config, onChange }: WizardStep4SchedulePro
             if (isNaN(num) || num < 1) set('keepBackupsCount', '1')
           }}
           placeholder="unlimited"
+        />
+      </div>
+
+      {/* Compression toggle */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm" style={{ color: 'var(--text-primary)' }}>Compression</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            Compress backup files with gzip (.sql.gz)
+          </p>
+        </div>
+        <Toggle
+          enabled={config.compressionEnabled}
+          onChange={() => set('compressionEnabled', !config.compressionEnabled)}
+        />
+      </div>
+
+      {/* Upload to S3 toggle */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm" style={{ color: 'var(--text-primary)' }}>Upload to S3</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            Upload backup to S3 after completion (requires S3 to be configured in Settings)
+          </p>
+        </div>
+        <Toggle
+          enabled={config.uploadToS3}
+          onChange={() => set('uploadToS3', !config.uploadToS3)}
         />
       </div>
     </div>

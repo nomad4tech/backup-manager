@@ -10,7 +10,9 @@ import tech.nomad4.backupmanager.isolate.awsbucket.dto.UploadCommand;
 import tech.nomad4.backupmanager.isolate.awsbucket.dto.UploadResult;
 import tech.nomad4.backupmanager.isolate.awsbucket.service.AwsBucketService;
 import tech.nomad4.backupmanager.isolate.backup.dto.BackupCommand;
+import tech.nomad4.backupmanager.isolate.backup.dto.BackupOptions;
 import tech.nomad4.backupmanager.isolate.backup.dto.BackupResult;
+import tech.nomad4.backupmanager.isolate.backup.dto.CompressionType;
 import tech.nomad4.backupmanager.isolate.backup.service.BackupExecutionService;
 import tech.nomad4.backupmanager.backuphistory.entity.BackupRecord;
 import tech.nomad4.backupmanager.backuphistory.entity.BackupStatus;
@@ -98,7 +100,8 @@ public class BackupExecutionOrchestrator {
 
         LocalDateTime startedAt = LocalDateTime.now();
         String taskDir = props.getBaseDirectory() + "/" + task.getName();
-        String filePath = taskDir + "/" + task.getName() + "_" + startedAt.format(TIMESTAMP_FMT) + ".sql";
+        String extension = task.isCompressionEnabled() ? ".sql.gz" : ".sql";
+        String filePath = taskDir + "/" + task.getName() + "_" + startedAt.format(TIMESTAMP_FMT) + extension;
 
         // Pre-flight: ensure base directory and verify disk space
         storageService.ensureDirectory(props.getBaseDirectory());
@@ -143,9 +146,20 @@ public class BackupExecutionOrchestrator {
                 recordRepository.save(record);
             }
 
-            BackupCommand command = BackupCommand.create(
-                    resolution.resolvedId(), task.getDatabaseName(), filePath, task.getDatabaseType(),
-                    props.getDefaultTimeout());
+            BackupOptions options = BackupOptions.defaults();
+            options.setTimeoutSeconds(props.getDefaultTimeout());
+            if (task.isCompressionEnabled()) {
+                options.setCompression(CompressionType.GZIP);
+            }
+
+            BackupCommand command = BackupCommand.builder()
+                    .containerId(resolution.resolvedId())
+                    .databaseName(task.getDatabaseName())
+                    .outputFilePath(filePath)
+                    .databaseType(task.getDatabaseType())
+                    .options(options)
+                    .postgresUser("postgres")
+                    .build();
             BackupResult result = backupExecutionService.executeBackup(client, command);
 
             if (result.isSuccess()) {
@@ -199,7 +213,7 @@ public class BackupExecutionOrchestrator {
         // AWS upload phase
         AppSettings settings = appSettingsService.get();
         UploadResult uploadResult = null;
-        if (settings.isAwsEnabled() && Boolean.TRUE.equals(settings.getAwsConnectionValid())) {
+        if (task.isUploadToS3() && settings.isAwsEnabled() && Boolean.TRUE.equals(settings.getAwsConnectionValid())) {
             uploadResult = uploadToAws(task, record, settings);
         }
 

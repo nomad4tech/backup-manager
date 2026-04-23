@@ -84,6 +84,12 @@ public class BackupTask {
     @Column(name = "keep_backups_count")
     private Integer keepBackupsCount;
 
+    @Column(name = "compression_enabled", nullable = false)
+    private boolean compressionEnabled = true;
+
+    @Column(name = "upload_to_s3", nullable = false)
+    private boolean uploadToS3 = true;
+
     /** Whether this task is active and should be scheduled. */
     @Column(nullable = false)
     private Boolean enabled = true;

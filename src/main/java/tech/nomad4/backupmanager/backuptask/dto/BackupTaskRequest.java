@@ -74,4 +74,10 @@ public class BackupTaskRequest {
 
     @Schema(description = "Whether the task is active. Defaults to true.", example = "true")
     private Boolean enabled = true;
+
+    @Schema(description = "Enable gzip compression for backup files. Defaults to true.", example = "true")
+    private Boolean compressionEnabled = true;
+
+    @Schema(description = "Upload backup to S3 after completion (requires AWS enabled in settings). Defaults to true.", example = "true")
+    private Boolean uploadToS3 = true;
 }
