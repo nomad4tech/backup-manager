@@ -82,7 +82,6 @@ export function TaskDetailPage() {
           keepBackupsCount: editForm.keepBackupsCount ? Number(editForm.keepBackupsCount) : undefined,
           compressionEnabled: editForm.compressionEnabled,
           uploadToS3: editForm.uploadToS3,
-          enabled: task.enabled ?? true,
         },
       },
       {
