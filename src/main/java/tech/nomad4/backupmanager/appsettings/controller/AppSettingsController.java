@@ -9,15 +9,22 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import okhttp3.OkHttpClient;
 import tech.nomad4.backupmanager.appsettings.dto.AppSettingsRequest;
 import tech.nomad4.backupmanager.appsettings.dto.AppSettingsResponse;
 import tech.nomad4.backupmanager.appsettings.dto.AwsCheckRequest;
+import tech.nomad4.backupmanager.appsettings.dto.ConnectionCheckResult;
+import tech.nomad4.backupmanager.appsettings.dto.EmailCheckRequest;
+import tech.nomad4.backupmanager.appsettings.dto.HeartbeatCheckRequest;
 import tech.nomad4.backupmanager.appsettings.entity.AppSettings;
 import tech.nomad4.backupmanager.appsettings.service.AppSettingsService;
 import tech.nomad4.backupmanager.appsettings.service.AppSettingsValidationService;
 import tech.nomad4.backupmanager.isolate.awsbucket.dto.BucketCheckResult;
 import tech.nomad4.backupmanager.isolate.awsbucket.dto.BucketConfig;
 import tech.nomad4.backupmanager.isolate.awsbucket.service.AwsBucketService;
+import tech.nomad4.backupmanager.isolate.email.dto.EmailCheckResult;
+import tech.nomad4.backupmanager.isolate.email.dto.EmailClientConfig;
+import tech.nomad4.backupmanager.isolate.email.service.EmailService;
 
 /**
  * REST controller for reading and updating global application settings.
@@ -34,6 +41,7 @@ public class AppSettingsController {
     private final AppSettingsService service;
     private final AppSettingsValidationService validationService;
     private final AwsBucketService awsBucketService;
+    private final EmailService emailService;
 
     @Operation(
             summary = "Get current application settings",
@@ -88,6 +96,70 @@ public class AppSettingsController {
                 .build();
 
         return ResponseEntity.ok(awsBucketService.checkConnection(config));
+    }
+
+    @Operation(summary = "Check email (SMTP) connectivity",
+            description = "Checks SMTP connectivity using credentials from the request body. " +
+                    "Pass password=null to use the stored password from the database.")
+    @ApiResponse(responseCode = "200",
+            content = @Content(schema = @Schema(implementation = ConnectionCheckResult.class)))
+    @PostMapping("/email/check")
+    public ResponseEntity<ConnectionCheckResult> checkEmail(@RequestBody EmailCheckRequest request) {
+        String password = request.getPassword() != null
+                ? request.getPassword()
+                : service.get().getEmailPassword();
+
+        EmailClientConfig config = EmailClientConfig.builder()
+                .host(request.getHost())
+                .port(request.getPort() != null ? request.getPort() : 587)
+                .username(request.getUsername())
+                .password(password)
+                .from(request.getFrom())
+                .ssl(request.isSsl())
+                .startTls(request.isStartTls())
+                .timeoutMs(request.getTimeoutMs() != null ? request.getTimeoutMs() : 10000)
+                .build();
+
+        EmailCheckResult result = EmailService.checkConnection(config);
+        return ResponseEntity.ok(ConnectionCheckResult.builder()
+                .reachable(result.isReachable())
+                .errorMessage(result.getErrorMessage())
+                .build());
+    }
+
+    @Operation(summary = "Check heartbeat URL connectivity",
+            description = "Performs an HTTP GET to the given URL and returns whether it responds successfully.")
+    @ApiResponse(responseCode = "200",
+            content = @Content(schema = @Schema(implementation = ConnectionCheckResult.class)))
+    @PostMapping("/heartbeat/check")
+    public ResponseEntity<ConnectionCheckResult> checkHeartbeat(@RequestBody HeartbeatCheckRequest request) {
+        String url = request.getUrl();
+        if (url == null || url.isBlank()) {
+            return ResponseEntity.ok(ConnectionCheckResult.builder()
+                    .reachable(false)
+                    .errorMessage("URL is required")
+                    .build());
+        }
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+                .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+                .build();
+
+        try (okhttp3.Response response = client.newCall(
+                new okhttp3.Request.Builder().url(url).get().build()
+        ).execute()) {
+            boolean ok = response.isSuccessful();
+            return ResponseEntity.ok(ConnectionCheckResult.builder()
+                    .reachable(ok)
+                    .errorMessage(ok ? null : "HTTP " + response.code())
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.ok(ConnectionCheckResult.builder()
+                    .reachable(false)
+                    .errorMessage(e.getMessage())
+                    .build());
+        }
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

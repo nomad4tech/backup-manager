@@ -5,10 +5,13 @@ import type {
   BackupRecord,
   BackupTask,
   BucketCheckResult,
+  ConnectionCheckResult,
   ContainerInfo,
   CreateBackupTaskRequest,
   CreateSocketRequest,
   DockerSocket,
+  EmailCheckRequest,
+  HeartbeatCheckRequest,
   HistoryFilters,
   Page,
   UpdateBackupTaskRequest,
@@ -174,6 +177,20 @@ export const settingsApi = {
 
 export async function checkAwsConnection(req: AwsCheckRequest): Promise<BucketCheckResult> {
   return request<BucketCheckResult>('/api/settings/aws/check', {
+    method: 'POST',
+    body: JSON.stringify(req),
+  })
+}
+
+export async function checkEmailConnection(req: EmailCheckRequest): Promise<ConnectionCheckResult> {
+  return request<ConnectionCheckResult>('/api/settings/email/check', {
+    method: 'POST',
+    body: JSON.stringify(req),
+  })
+}
+
+export async function checkHeartbeatConnection(req: HeartbeatCheckRequest): Promise<ConnectionCheckResult> {
+  return request<ConnectionCheckResult>('/api/settings/heartbeat/check', {
     method: 'POST',
     body: JSON.stringify(req),
   })

@@ -182,6 +182,26 @@ export interface AppSettingsResponse {
   updatedAt: string | null
 }
 
+export interface EmailCheckRequest {
+  host: string
+  port: number
+  username?: string
+  password: string | null
+  from?: string
+  ssl: boolean
+  startTls: boolean
+  timeoutMs?: number
+}
+
+export interface HeartbeatCheckRequest {
+  url: string
+}
+
+export interface ConnectionCheckResult {
+  reachable: boolean
+  errorMessage?: string
+}
+
 export interface AwsCheckRequest {
   bucketName: string
   region: string

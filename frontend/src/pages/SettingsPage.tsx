@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { useSettings, useUpdateSettings } from '@/hooks/useSettings'
 import { useMe, useChangeCredentials } from '@/hooks/useAuth'
 import { ErrorMessage } from '@/components/common/ErrorMessage'
-import { checkAwsConnection } from '@/api/client'
-import type { AppSettingsRequest, AppSettingsResponse, BucketCheckResult } from '@/api/types'
+import { checkAwsConnection, checkEmailConnection, checkHeartbeatConnection } from '@/api/client'
+import type { AppSettingsRequest, AppSettingsResponse, BucketCheckResult, ConnectionCheckResult } from '@/api/types'
 
 // ─── Form state ──────────────────────────────────────────────────────────────
 
@@ -266,6 +266,10 @@ export function SettingsPage() {
   const [awsCheckResult, setAwsCheckResult] = useState<BucketCheckResult | null>(null)
   const [awsChecking, setAwsChecking] = useState(false)
   const awsCheckTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [emailCheckResult, setEmailCheckResult] = useState<ConnectionCheckResult | null>(null)
+  const [emailChecking, setEmailChecking] = useState(false)
+  const [heartbeatCheckResult, setHeartbeatCheckResult] = useState<ConnectionCheckResult | null>(null)
+  const [heartbeatChecking, setHeartbeatChecking] = useState(false)
 
   const { data: me } = useMe()
   const changeCredentials = useChangeCredentials()
@@ -335,6 +339,41 @@ export function SettingsPage() {
       awsCheckTimerRef.current = setTimeout(() => setAwsCheckResult(null), 10_000)
     } finally {
       setAwsChecking(false)
+    }
+  }
+
+  async function handleEmailCheck() {
+    if (!form) return
+    setEmailChecking(true)
+    setEmailCheckResult(null)
+    try {
+      const result = await checkEmailConnection({
+        host: form.emailHost,
+        port: Number(form.emailPort),
+        username: form.emailUsername || undefined,
+        password: form.emailPassword,
+        from: form.emailFrom || undefined,
+        ssl: form.emailSsl,
+        startTls: form.emailStartTls,
+        timeoutMs: Number(form.emailTimeoutMs),
+      })
+      setEmailCheckResult(result)
+      setTimeout(() => setEmailCheckResult(null), 10000)
+    } finally {
+      setEmailChecking(false)
+    }
+  }
+
+  async function handleHeartbeatCheck() {
+    if (!form) return
+    setHeartbeatChecking(true)
+    setHeartbeatCheckResult(null)
+    try {
+      const result = await checkHeartbeatConnection({ url: form.heartbeatUrl })
+      setHeartbeatCheckResult(result)
+      setTimeout(() => setHeartbeatCheckResult(null), 10000)
+    } finally {
+      setHeartbeatChecking(false)
     }
   }
 
@@ -437,7 +476,25 @@ export function SettingsPage() {
               </div>
               <div className="flex items-center gap-3">
                 {form.emailEnabled && (
-                  <ConnectionBadge valid={settings.emailConnectionValid} />
+                  <>
+                    {emailCheckResult !== null
+                      ? <ConnectionBadge valid={emailCheckResult.reachable} />
+                      : <ConnectionBadge valid={settings.emailConnectionValid} />
+                    }
+                    <button
+                      type="button"
+                      onClick={handleEmailCheck}
+                      disabled={emailChecking || !form.emailHost}
+                      className="px-3 py-1.5 text-xs rounded-md border transition-colors disabled:opacity-50"
+                      style={{
+                        borderColor: 'var(--border)',
+                        color: 'var(--text-secondary)',
+                        backgroundColor: 'transparent',
+                      }}
+                    >
+                      {emailChecking ? 'Checking…' : 'Check'}
+                    </button>
+                  </>
                 )}
                 <Toggle
                   enabled={form.emailEnabled}
@@ -820,7 +877,25 @@ export function SettingsPage() {
               </div>
               <div className="flex items-center gap-3">
                 {form.heartbeatEnabled && (
-                  <ConnectionBadge valid={settings.heartbeatConnectionValid} />
+                  <>
+                    {heartbeatCheckResult !== null
+                      ? <ConnectionBadge valid={heartbeatCheckResult.reachable} />
+                      : <ConnectionBadge valid={settings.heartbeatConnectionValid} />
+                    }
+                    <button
+                      type="button"
+                      onClick={handleHeartbeatCheck}
+                      disabled={heartbeatChecking || !form.heartbeatUrl}
+                      className="px-3 py-1.5 text-xs rounded-md border transition-colors disabled:opacity-50"
+                      style={{
+                        borderColor: 'var(--border)',
+                        color: 'var(--text-secondary)',
+                        backgroundColor: 'transparent',
+                      }}
+                    >
+                      {heartbeatChecking ? 'Checking…' : 'Check'}
+                    </button>
+                  </>
                 )}
                 <Toggle
                   enabled={form.heartbeatEnabled}
