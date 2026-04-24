@@ -1,20 +1,14 @@
-version: '3.8'
-
+# docker-compose.yml
 services:
-  app:
+  backup-manager:
     image: nomad4tech/backup-manager:latest
     container_name: backup-manager
     ports:
-      - "${APP_PORT:-8080}:8080"
+      - "8080:8080"
     volumes:
-      - backup_manager_h2:/data
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./data:/app/data       # settings & task config (required)
+      - ./backups:/app/backups  # backup files (required)
     environment:
-      DATASOURCE_URL: ${DATASOURCE_URL:-jdbc:h2:file:/data/backup-manager;AUTO_SERVER=TRUE}
+      - SPRING_PROFILES_ACTIVE=docker
     restart: unless-stopped
-    group_add:
-      - "${DOCKER_GROUP_ID:-986}"
-
-volumes:
-  backup_manager_h2:
-    name: backup_manager_h2_data

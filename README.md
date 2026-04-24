@@ -7,6 +7,9 @@ Connect your Docker hosts, discover running databases automatically, and set up 
 
 ---
 
+Deploy on the same host as your database -> open the UI -> create a task -> first backup running in under 2 minutes. 
+No credentials stored in config files, no backdoors - dumps run inside the container via Docker exec API
+
 ## Features
 
 - 🐳 **Docker-native** - local socket or SSH tunnel to remote hosts
