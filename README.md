@@ -1,4 +1,5 @@
-# <img src="frontend/public/favicon.svg" width="32" alt="icon"> Backup Manager
+# <img src="https://github.com/nomad4tech/backup-manager/blob/2668f398d4a42735f387dbb01d5490d43abb36ea/frontend/public/favicon.svg" width="32" alt="icon"> Backup Manager
+
 A self-hosted web UI for scheduling and managing database backups in Docker environments.
 
 Connect your Docker hosts, discover running databases automatically, and set up scheduled backups - without touching a config file.
@@ -7,8 +8,33 @@ Connect your Docker hosts, discover running databases automatically, and set up 
 
 ---
 
-Deploy on the same host as your database -> open the UI -> create a task -> first backup running in under 2 minutes. 
-No credentials stored in config files, no backdoors - dumps run inside the container via Docker exec API
+Deploy on the same host as your database -> open the UI -> create a task -> **first backup in under 2 minutes.**
+
+No credentials stored in config files, no backdoors - dumps run inside the container via Docker exec API.
+
+---
+
+## Demo
+
+<div align="center">
+ <a href="https://youtu.be/3rXkPmOpDNc">
+    <img src="https://img.youtube.com/vi/3rXkPmOpDNc/maxresdefault.jpg" width="400" alt="Watch the demo">
+  </a>
+</div>
+
+**Creating a backup task:**
+
+<div align="center">
+<img src="https://github.com/nomad4tech/backup-manager/blob/2668f398d4a42735f387dbb01d5490d43abb36ea/assets/wizard.gif" width="400" alt="Running a backup">
+</div>
+
+**Running a backup:**
+
+<div align="center">
+<img src="https://github.com/nomad4tech/backup-manager/blob/2668f398d4a42735f387dbb01d5490d43abb36ea/assets/run.gif" width="400" alt="Running a backup">
+</div>
+
+---
 
 ## Features
 
@@ -59,7 +85,7 @@ Default credentials: **admin/admin** - change them immediately in **Settings -> 
 
 ## Remote Docker Hosts (SSH)
 
-Go to **Docker Sockets → Add Socket**, enter the host and SSH credentials. Backup Manager establishes an SSH tunnel and proxies the Docker socket transparently.
+Go to **Docker Sockets -> Add Socket**, enter the host and SSH credentials. Backup Manager establishes an SSH tunnel and proxies the Docker socket transparently.
 
 `socat` is managed automatically: if port `2375` is free on the remote host, Backup Manager starts socat via SSH and stops it on disconnect. If Docker is already exposed on that port by other means, no setup is needed. Install `socat` on the remote host only if Backup Manager needs to start it itself.
 
@@ -99,16 +125,19 @@ No credentials are stored in config files. PostgreSQL uses `$POSTGRES_USER`, MyS
 ---
 
 ## Known Limitations
+
 - **Early stage** - actively developed and tested by single maintainer; edge cases and environment-specific bugs may exist; feedback and bug reports are welcome
 - **No HTTPS** - run behind reverse proxy (Nginx + Let's Encrypt, Caddy, or Cloudflare Tunnel) in production; don't expose application port directly to the internet
 - **No progress indicator** - large backups show `RUNNING` until complete
 - **SSH transfers are slow** - all dump data travels through the tunnel; schedule large remote backups off-peak
-- **Windows not tested** - socket path is hardcoded to `/var/run/docker.sock`
+- **Linux only** - socket path is hardcoded to `/var/run/docker.sock`; Windows not tested
 
 ---
 
 ## Roadmap
+
 > No specific priority or timeline. Features are added as time and interest allow
+
 - [ ] Restore from backup via UI
 - [ ] Progress indicator for running backups
 - [ ] Notification webhooks
