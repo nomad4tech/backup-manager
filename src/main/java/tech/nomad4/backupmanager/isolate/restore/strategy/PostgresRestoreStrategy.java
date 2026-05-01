@@ -45,8 +45,9 @@ public class PostgresRestoreStrategy implements RestoreStrategy {
 
         Path inputPath = Paths.get(command.getInputFilePath());
 
+        ExecCreateCmdResponse exec = null;
         try {
-            ExecCreateCmdResponse exec = dockerClient.execCreateCmd(command.getContainerId())
+            exec = dockerClient.execCreateCmd(command.getContainerId())
                     .withAttachStdin(true)
                     .withAttachStdout(true)
                     .withAttachStderr(true)
@@ -91,6 +92,36 @@ public class PostgresRestoreStrategy implements RestoreStrategy {
             Thread.currentThread().interrupt();
             throw new RestoreException("Restore interrupted", e);
         } catch (Exception e) {
+            // okhttp closes the connection after stdin EOF which causes
+            // AsynchronousCloseException / SocketException — psql may have already
+            // succeeded. Always attempt to inspect exit code before declaring failure.
+            if (exec != null) {
+                try {
+                    InspectExecResponse inspect = dockerClient.inspectExecCmd(exec.getId()).exec();
+                    Long exitCode = inspect.getExitCodeLong();
+
+                    if (exitCode == null) {
+                        // exec state not yet settled — wait briefly and retry once
+                        Thread.sleep(2000);
+                        inspect = dockerClient.inspectExecCmd(exec.getId()).exec();
+                        exitCode = inspect.getExitCodeLong();
+                    }
+
+                    if (exitCode != null && exitCode == 0) {
+                        log.warn("psql exited with code 0 despite connection error — treating as success. Error was: {}", e.getMessage());
+                        return;
+                    }
+
+                    if (exitCode != null && exitCode != 0) {
+                        throw new RestoreException("psql exited with code: " + exitCode);
+                    }
+
+                } catch (RestoreException re) {
+                    throw re;
+                } catch (Exception inspectEx) {
+                    log.warn("Could not inspect exec after error: {}", inspectEx.getMessage());
+                }
+            }
             throw new RestoreException("Unexpected error during psql restore", e);
         }
     }

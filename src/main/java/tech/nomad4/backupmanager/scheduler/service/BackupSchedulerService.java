@@ -63,6 +63,7 @@ public class BackupSchedulerService {
     @PostConstruct
     public void scheduleEnabledTasks() {
         List<BackupTask> tasks = taskRepository.findByEnabledTrue();
+
         log.info("Scheduling {} enabled backup task(s) on startup", tasks.size());
         tasks.forEach(this::scheduleTask);
     }

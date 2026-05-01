@@ -33,6 +33,9 @@
         <sshj.version>0.38.0</sshj.version>
         <springdoc.version>3.0.1</springdoc.version>
         <awssdk.version>2.26.31</awssdk.version>
+        <!-- Pinned to 4.9.3 — docker-java 3.3.4 uses HijackingInterceptor which calls
+             RealInterceptorChain.exchange() removed in okhttp 4.10+ -->
+        <okhttp.version>4.9.3</okhttp.version>
     </properties>
 
     <repositories>
@@ -94,13 +97,6 @@
             <version>${docker-java.version}</version>
         </dependency>
 
-        <!-- OkHttp - explicit direct dependency for heartbeat URL checks -->
-        <dependency>
-            <groupId>com.squareup.okhttp3</groupId>
-            <artifactId>okhttp</artifactId>
-            <version>4.12.0</version>
-        </dependency>
-
         <!-- SSHJ for SSH tunneling with Unix socket support -->
         <dependency>
             <groupId>com.hierynomus</groupId>
@@ -135,7 +131,6 @@
             <artifactId>s3</artifactId>
             <version>${awssdk.version}</version>
         </dependency>
-
 
         <!-- Spring Boot Test -->
         <dependency>

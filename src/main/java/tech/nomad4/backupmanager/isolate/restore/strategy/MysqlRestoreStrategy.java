@@ -46,8 +46,9 @@ public class MysqlRestoreStrategy implements RestoreStrategy {
 
         Path inputPath = Paths.get(command.getInputFilePath());
 
+        ExecCreateCmdResponse exec = null;
         try {
-            ExecCreateCmdResponse exec = dockerClient.execCreateCmd(command.getContainerId())
+            exec = dockerClient.execCreateCmd(command.getContainerId())
                     .withAttachStdin(true)
                     .withAttachStdout(true)
                     .withAttachStderr(true)
@@ -92,6 +93,27 @@ public class MysqlRestoreStrategy implements RestoreStrategy {
             Thread.currentThread().interrupt();
             throw new RestoreException("Restore interrupted", e);
         } catch (Exception e) {
+            // AsynchronousCloseException or SocketException can occur when okhttp closes
+            // the connection after stdin EOF — mysql may have already succeeded.
+            // Attempt to check exit code before declaring failure.
+            boolean isConnectionReset = e.getMessage() != null && (
+                e.getCause() instanceof java.nio.channels.AsynchronousCloseException ||
+                e.getCause() instanceof java.net.SocketException ||
+                (e.getCause() != null && e.getCause().getCause() instanceof java.nio.channels.AsynchronousCloseException) ||
+                (e.getCause() != null && e.getCause().getCause() instanceof java.net.SocketException)
+            );
+            if (isConnectionReset && exec != null) {
+                try {
+                    InspectExecResponse inspect = dockerClient.inspectExecCmd(exec.getId()).exec();
+                    Long exitCode = inspect.getExitCodeLong();
+                    if (exitCode != null && exitCode == 0) {
+                        log.warn("mysqldump connection closed abruptly but exit code is 0 — treating as success");
+                        return;
+                    }
+                } catch (Exception inspectEx) {
+                    log.warn("Could not inspect exec after connection reset: {}", inspectEx.getMessage());
+                }
+            }
             throw new RestoreException("Unexpected error during mysql restore", e);
         }
     }
