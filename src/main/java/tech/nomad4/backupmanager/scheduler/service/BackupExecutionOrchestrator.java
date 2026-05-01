@@ -385,6 +385,7 @@ public class BackupExecutionOrchestrator {
         r.setContainerId(task.getContainerId());
         r.setContainerName(task.getContainerName());
         r.setDatabaseName(task.getDatabaseName());
+        r.setDatabaseType(task.getDatabaseType());
         r.setStartedAt(startedAt);
         r.setFilePath(filePath);
         return r;
