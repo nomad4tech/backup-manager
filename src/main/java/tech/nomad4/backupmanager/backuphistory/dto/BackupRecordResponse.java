@@ -35,6 +35,9 @@ public class BackupRecordResponse {
     @Schema(example = "mydb")
     private final String databaseName;
 
+    @Schema(example = "POSTGRES")
+    private final String databaseType;
+
     @Schema(example = "SUCCESS")
     private final BackupStatus status;
 
@@ -74,6 +77,7 @@ public class BackupRecordResponse {
                 .containerId(record.getContainerId())
                 .containerName(record.getContainerName())
                 .databaseName(record.getDatabaseName())
+                .databaseType(record.getDatabaseType() != null ? record.getDatabaseType().name() : null)
                 .status(record.getStatus())
                 .startedAt(record.getStartedAt())
                 .completedAt(record.getCompletedAt())
