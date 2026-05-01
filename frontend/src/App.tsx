@@ -10,6 +10,9 @@ import { TaskCreatePage } from '@/pages/TaskCreatePage'
 import { TaskDetailPage } from '@/pages/TaskDetailPage'
 import { HistoryPage } from '@/pages/HistoryPage'
 import { SettingsPage } from '@/pages/SettingsPage'
+import { RestorePage } from '@/pages/RestorePage'
+import { RestoreCreatePage } from '@/pages/RestoreCreatePage'
+import { RestoreDetailPage } from '@/pages/RestoreDetailPage'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +38,9 @@ export default function App() {
               <Route path="/tasks/new" element={<TaskCreatePage />} />
               <Route path="/tasks/:id" element={<TaskDetailPage />} />
               <Route path="/history" element={<HistoryPage />} />
+              <Route path="/restore" element={<RestorePage />} />
+              <Route path="/restore/new" element={<RestoreCreatePage />} />
+              <Route path="/restore/:id" element={<RestoreDetailPage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>
           </Route>

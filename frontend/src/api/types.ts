@@ -111,6 +111,7 @@ export interface BackupRecord {
   containerId: string
   containerName?: string
   databaseName: string
+  databaseType?: string
   status: BackupStatus
   startedAt: string
   completedAt?: string
@@ -217,6 +218,45 @@ export interface BucketCheckResult {
   reachable: boolean
   errorMessage?: string
 }
+
+// ──────────────────────────────────────────
+// Restore
+// ──────────────────────────────────────────
+
+export interface RestoreRecord {
+  id: number
+  backupRecordId: number | null
+  backupFilePath: string
+  socketId: number
+  containerId: string
+  containerName: string
+  sourceDatabaseName: string
+  targetDatabaseName: string
+  databaseType: string
+  status: 'PENDING' | 'RUNNING' | 'SUCCESS' | 'FAILED' | 'CANCELLED'
+  startedAt: string
+  completedAt: string | null
+  durationMs: number | null
+  errorMessage: string | null
+}
+
+export interface DbExistsResponse {
+  exists: boolean
+  databaseName: string
+  message: string
+}
+
+export interface CreateRestoreRequest {
+  backupRecordId: number
+  socketId: number
+  containerId: string
+  containerName: string
+  targetDatabaseName: string
+}
+
+// ──────────────────────────────────────────
+// App Settings
+// ──────────────────────────────────────────
 
 export interface AppSettingsRequest {
   // Email

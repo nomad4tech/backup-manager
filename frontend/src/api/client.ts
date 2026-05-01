@@ -8,12 +8,15 @@ import type {
   ConnectionCheckResult,
   ContainerInfo,
   CreateBackupTaskRequest,
+  CreateRestoreRequest,
   CreateSocketRequest,
+  DbExistsResponse,
   DockerSocket,
   EmailCheckRequest,
   HeartbeatCheckRequest,
   HistoryFilters,
   Page,
+  RestoreRecord,
   UpdateBackupTaskRequest,
   UpdateSocketRequest,
 } from './types'
@@ -218,6 +221,36 @@ export const historyApi = {
 
   delete: (id: number) =>
     request<void>(`/api/backup-history/${id}`, { method: 'DELETE' }),
+}
+
+// ──────────────────────────────────────────
+// Restore
+// ──────────────────────────────────────────
+
+export const restoreApi = {
+  list: (page = 0, size = 20) =>
+    request<Page<RestoreRecord>>(`/api/restore?page=${page}&size=${size}`),
+
+  get: (id: number) => request<RestoreRecord>(`/api/restore/${id}`),
+
+  availableBackups: () => request<BackupRecord[]>('/api/restore/backups'),
+
+  compatibleContainers: (socketId: number, dbType: string) =>
+    request<ContainerInfo[]>(`/api/restore/containers?socketId=${socketId}&dbType=${dbType}`),
+
+  checkDb: (socketId: number, containerId: string, dbName: string, dbType: string) =>
+    request<DbExistsResponse>(
+      `/api/restore/check-db?socketId=${socketId}&containerId=${encodeURIComponent(containerId)}&dbName=${encodeURIComponent(dbName)}&dbType=${dbType}`,
+    ),
+
+  create: (data: CreateRestoreRequest) =>
+    request<RestoreRecord>('/api/restore', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  cancel: (id: number) =>
+    request<void>(`/api/restore/${id}/cancel`, { method: 'DELETE' }),
 }
 
 // ──────────────────────────────────────────

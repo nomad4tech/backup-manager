@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Database, Github, History, LogOut, Server, Settings } from 'lucide-react'
+import { Database, Github, History, LogOut, RotateCcw, Server, Settings } from 'lucide-react'
 import { useSettings } from '@/hooks/useSettings'
 import { useLogout } from '@/hooks/useAuth'
 
@@ -13,6 +13,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { to: '/sockets', icon: <Server className="w-4 h-4" />, label: 'Docker Sockets', end: true },
   { to: '/tasks', icon: <Database className="w-4 h-4" />, label: 'Backup Tasks' },
+  { to: '/restore', icon: <RotateCcw className="w-4 h-4" />, label: 'Restore' },
   { to: '/history', icon: <History className="w-4 h-4" />, label: 'History' },
 ]
 
