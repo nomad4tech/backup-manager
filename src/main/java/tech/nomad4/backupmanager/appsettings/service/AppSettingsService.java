@@ -35,7 +35,10 @@ public class AppSettingsService {
     public void init() {
         if (!repository.existsById(1L)) {
             log.info("No app settings found - initializing defaults");
-            repository.save(new AppSettings());
+            AppSettings defaults = new AppSettings();
+            defaults.setRestoreNotifyOnSuccess(true);
+            defaults.setRestoreNotifyOnFailure(true);
+            repository.save(defaults);
         }
     }
 
@@ -53,7 +56,10 @@ public class AppSettingsService {
     public AppSettings get() {
         return repository.findById(1L).orElseGet(() -> {
             log.info("No app settings found - initializing defaults");
-            return repository.save(new AppSettings());
+            AppSettings defaults = new AppSettings();
+            defaults.setRestoreNotifyOnSuccess(true);
+            defaults.setRestoreNotifyOnFailure(true);
+            return repository.save(defaults);
         });
     }
 

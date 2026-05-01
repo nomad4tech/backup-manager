@@ -1,6 +1,7 @@
 package tech.nomad4.backupmanager.appsettings.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -90,12 +91,22 @@ public class AppSettings {
     private String notificationRecipients;
 
     /** Send an email notification when a restore completes successfully. */
-    @Column(name = "restore_notify_on_success", nullable = false)
-    private boolean restoreNotifyOnSuccess = true;
+    @Getter(AccessLevel.NONE)
+    @Column(name = "restore_notify_on_success")
+    private Boolean restoreNotifyOnSuccess = true;
 
     /** Send an email notification when a restore fails. */
-    @Column(name = "restore_notify_on_failure", nullable = false)
-    private boolean restoreNotifyOnFailure = true;
+    @Getter(AccessLevel.NONE)
+    @Column(name = "restore_notify_on_failure")
+    private Boolean restoreNotifyOnFailure = true;
+
+    public boolean isRestoreNotifyOnSuccess() {
+        return restoreNotifyOnSuccess != null ? restoreNotifyOnSuccess : true;
+    }
+
+    public boolean isRestoreNotifyOnFailure() {
+        return restoreNotifyOnFailure != null ? restoreNotifyOnFailure : true;
+    }
 
     // -------------------------------------------------------------------------
     // AWS / S3
