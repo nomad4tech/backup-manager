@@ -352,16 +352,38 @@ public class StorageService {
      * @return paths of files that were successfully deleted
      */
     public List<String> cleanupFiles(String directory, CleanupPolicy policy) {
+        return cleanupFiles(directory, policy, Collections.emptySet());
+    }
+
+    /**
+     * Deletes files in {@code directory} according to the given retention policy,
+     * skipping any paths present in {@code protectedPaths} (e.g. files in use by
+     * an active restore operation).
+     *
+     * @param directory      directory to clean up
+     * @param policy         retention policy controlling which files to delete
+     * @param protectedPaths file paths that must not be deleted
+     * @return paths of files that were successfully deleted
+     */
+    public List<String> cleanupFiles(String directory, CleanupPolicy policy, Set<String> protectedPaths) {
         List<FileInfo> files = listFiles(directory, "*");
 
         // Sort oldest first so index-based operations are predictable
         files.sort(Comparator.comparing(FileInfo::getModified));
 
-        List<String> toDelete = switch (policy.getType()) {
+        List<String> toDelete = new ArrayList<>(switch (policy.getType()) {
             case COUNT -> selectByCount(files, policy.getKeepLastN());
             case TIME  -> selectByTime(files, policy.getKeepDays());
             case SIZE  -> selectBySize(files, policy.getMaxTotalSizeBytes());
-        };
+        });
+
+        toDelete.removeIf(path -> {
+            if (protectedPaths.contains(path)) {
+                log.info("Skipping cleanup of protected file (active restore): {}", path);
+                return true;
+            }
+            return false;
+        });
 
         List<String> deleted = new ArrayList<>();
         for (String filepath : toDelete) {

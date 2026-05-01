@@ -29,11 +29,17 @@ import tech.nomad4.backupmanager.scheduler.exception.BackupAlreadyRunningExcepti
 import tech.nomad4.backupmanager.socketmanagement.service.DockerSocketFacadeService;
 import tech.nomad4.backupmanager.isolate.storage.dto.CleanupPolicy;
 import tech.nomad4.backupmanager.isolate.storage.service.StorageService;
+import tech.nomad4.backupmanager.restore.entity.RestoreRecord;
+import tech.nomad4.backupmanager.restore.entity.RestoreStatus;
+import tech.nomad4.backupmanager.restore.repository.RestoreRecordRepository;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Orchestrates the full lifecycle of a single backup run.
@@ -73,6 +79,7 @@ public class BackupExecutionOrchestrator {
     private final AppSettingsService appSettingsService;
     private final AwsBucketService awsBucketService;
     private final EmailService emailService;
+    private final RestoreRecordRepository restoreRecordRepository;
 
     // -------------------------------------------------------------------------
     // Main entry point
@@ -201,8 +208,14 @@ public class BackupExecutionOrchestrator {
 
         // Cleanup old backups if a retention limit is configured
         if (task.getKeepBackupsCount() != null) {
+            Set<String> protectedPaths = restoreRecordRepository
+                    .findByStatusIn(List.of(RestoreStatus.RUNNING))
+                    .stream()
+                    .map(RestoreRecord::getBackupFilePath)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
             List<String> deleted = storageService.cleanupFiles(
-                    taskDir, CleanupPolicy.keepLastN(task.getKeepBackupsCount()));
+                    taskDir, CleanupPolicy.keepLastN(task.getKeepBackupsCount()), protectedPaths);
             if (!deleted.isEmpty()) {
                 recordService.markFilesDeleted(deleted);
                 log.info("Cleanup: removed {} old backup(s) for task {} ({})",
