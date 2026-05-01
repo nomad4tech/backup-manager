@@ -156,6 +156,8 @@ public class AppSettingsService {
         settings.setNotifyOnSuccess(req.isNotifyOnSuccess());
         settings.setNotifyOnFailure(req.isNotifyOnFailure());
         settings.setNotificationRecipients(req.getNotificationRecipients());
+        settings.setRestoreNotifyOnSuccess(req.isRestoreNotifyOnSuccess());
+        settings.setRestoreNotifyOnFailure(req.isRestoreNotifyOnFailure());
 
         // AWS
         settings.setAwsEnabled(req.isAwsEnabled());

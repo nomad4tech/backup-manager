@@ -17,6 +17,11 @@ import tech.nomad4.backupmanager.isolate.command.service.PostgresCommandService;
 import tech.nomad4.backupmanager.isolate.discovery.filter.ContainerFilter;
 import tech.nomad4.backupmanager.isolate.discovery.filter.PostgresContainerFilter;
 import tech.nomad4.backupmanager.isolate.discovery.service.ContainerDiscoveryService;
+import tech.nomad4.backupmanager.isolate.restore.service.RestoreExecutionService;
+import tech.nomad4.backupmanager.isolate.restore.strategy.MariadbRestoreStrategy;
+import tech.nomad4.backupmanager.isolate.restore.strategy.MysqlRestoreStrategy;
+import tech.nomad4.backupmanager.isolate.restore.strategy.PostgresRestoreStrategy;
+import tech.nomad4.backupmanager.isolate.restore.strategy.RestoreStrategy;
 import tech.nomad4.dockersocketmanager.service.DockerSocketService;
 import tech.nomad4.backupmanager.isolate.storage.service.StorageService;
 
@@ -120,6 +125,30 @@ public class CoreBeansConfig {
     @Bean
     public BackupExecutionService backupExecutionService(List<BackupStrategy> strategies) {
         return new BackupExecutionService(strategies);
+    }
+
+    // -------------------------------------------------------------------------
+    // restore
+    // -------------------------------------------------------------------------
+
+    @Bean
+    public PostgresRestoreStrategy postgresRestoreStrategy() {
+        return new PostgresRestoreStrategy();
+    }
+
+    @Bean
+    public MysqlRestoreStrategy mysqlRestoreStrategy() {
+        return new MysqlRestoreStrategy();
+    }
+
+    @Bean
+    public MariadbRestoreStrategy mariadbRestoreStrategy(MysqlRestoreStrategy mysqlRestoreStrategy) {
+        return new MariadbRestoreStrategy(mysqlRestoreStrategy);
+    }
+
+    @Bean
+    public RestoreExecutionService restoreExecutionService(List<RestoreStrategy> strategies) {
+        return new RestoreExecutionService(strategies);
     }
 
     // -------------------------------------------------------------------------

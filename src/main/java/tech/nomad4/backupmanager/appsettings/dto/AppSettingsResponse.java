@@ -46,6 +46,8 @@ public class AppSettingsResponse {
     private final boolean notifyOnSuccess;
     private final boolean notifyOnFailure;
     private final String notificationRecipients;
+    private final boolean restoreNotifyOnSuccess;
+    private final boolean restoreNotifyOnFailure;
 
     // -------------------------------------------------------------------------
     // AWS / S3
@@ -103,6 +105,8 @@ public class AppSettingsResponse {
                 .notifyOnSuccess(s.isNotifyOnSuccess())
                 .notifyOnFailure(s.isNotifyOnFailure())
                 .notificationRecipients(s.getNotificationRecipients())
+                .restoreNotifyOnSuccess(s.isRestoreNotifyOnSuccess())
+                .restoreNotifyOnFailure(s.isRestoreNotifyOnFailure())
                 // AWS
                 .awsEnabled(s.isAwsEnabled())
                 .awsBucketName(s.getAwsBucketName())

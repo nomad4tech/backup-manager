@@ -67,6 +67,12 @@ public class AppSettingsRequest {
             example = "ops@example.com,admin@example.com")
     private String notificationRecipients;
 
+    @Schema(description = "Send email notification when a restore succeeds", example = "true")
+    private boolean restoreNotifyOnSuccess = true;
+
+    @Schema(description = "Send email notification when a restore fails", example = "true")
+    private boolean restoreNotifyOnFailure = true;
+
     // -------------------------------------------------------------------------
     // AWS / S3
     // -------------------------------------------------------------------------

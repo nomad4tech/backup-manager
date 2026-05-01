@@ -89,6 +89,14 @@ public class AppSettings {
     @Column(name = "notification_recipients", length = 1000)
     private String notificationRecipients;
 
+    /** Send an email notification when a restore completes successfully. */
+    @Column(name = "restore_notify_on_success", nullable = false)
+    private boolean restoreNotifyOnSuccess = true;
+
+    /** Send an email notification when a restore fails. */
+    @Column(name = "restore_notify_on_failure", nullable = false)
+    private boolean restoreNotifyOnFailure = true;
+
     // -------------------------------------------------------------------------
     // AWS / S3
     // -------------------------------------------------------------------------
