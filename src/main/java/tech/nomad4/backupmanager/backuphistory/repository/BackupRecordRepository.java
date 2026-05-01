@@ -43,4 +43,7 @@ public interface BackupRecordRepository extends JpaRepository<BackupRecord, Long
 
     /** Used when a task is deleted: nullify taskId references. */
     List<BackupRecord> findByTaskId(Long taskId);
+
+    /** Used by the restore flow: backup records that have a file on disk. */
+    List<BackupRecord> findByFilePathNotNullOrderByStartedAtDesc();
 }

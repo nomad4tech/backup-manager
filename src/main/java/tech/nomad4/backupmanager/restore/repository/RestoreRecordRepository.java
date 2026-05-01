@@ -1,5 +1,6 @@
 package tech.nomad4.backupmanager.restore.repository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,7 @@ import java.util.List;
 @Repository
 public interface RestoreRecordRepository extends JpaRepository<RestoreRecord, Long> {
 
-    List<RestoreRecord> findAllByOrderByStartedAtDesc(Pageable pageable);
+    Page<RestoreRecord> findAllByOrderByStartedAtDesc(Pageable pageable);
 
     List<RestoreRecord> findByStatusIn(List<RestoreStatus> statuses);
 
